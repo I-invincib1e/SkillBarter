@@ -1,0 +1,141 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply font-sans antialiased;
+    @apply bg-gray-50 text-gray-800;
+    @apply dark:bg-dark-bg dark:text-gray-200;
+  }
+
+  ::selection {
+    @apply bg-primary-500/20 text-primary-900;
+  }
+
+  .dark ::selection {
+    @apply bg-primary-400/30 text-primary-100;
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-white/70 backdrop-blur-2xl border border-white/50;
+    @apply dark:bg-dark-surface/70 dark:border-dark-border/50;
+  }
+
+  .glass-nav {
+    @apply bg-white/80 backdrop-blur-2xl border-b border-gray-200/60;
+    @apply dark:bg-dark-bg/85 dark:border-dark-border/60;
+  }
+
+  .card {
+    @apply bg-white rounded-2xl p-6 shadow-soft border border-gray-100;
+    @apply dark:bg-dark-card dark:shadow-none dark:border-dark-border;
+    @apply transition-all duration-300;
+  }
+
+  .card-hover {
+    @apply hover:-translate-y-1 hover:shadow-soft-lg;
+    @apply dark:hover:border-gray-600;
+  }
+
+  .clay-badge {
+    @apply rounded-full px-4 py-2 font-semibold text-white;
+    @apply shadow-clay dark:shadow-clay-dark;
+    @apply transform transition-transform hover:scale-105;
+  }
+
+  .btn-primary {
+    @apply bg-primary-600 hover:bg-primary-700 text-white;
+    @apply px-5 py-3 rounded-xl font-semibold;
+    @apply transform transition-all duration-200;
+    @apply hover:shadow-glow-blue hover:scale-[1.02] active:scale-[0.98];
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-500/40 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-dark-bg;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none;
+  }
+
+  .btn-secondary {
+    @apply bg-white border border-gray-200 text-gray-700;
+    @apply dark:bg-dark-card dark:border-dark-border dark:text-gray-200;
+    @apply px-5 py-3 rounded-xl font-semibold;
+    @apply transform transition-all duration-200;
+    @apply hover:bg-gray-50 dark:hover:bg-dark-surface;
+    @apply hover:border-gray-300 dark:hover:border-gray-600;
+    @apply hover:scale-[1.02] active:scale-[0.98];
+    @apply focus:outline-none focus:ring-2 focus:ring-gray-300/50;
+  }
+
+  .btn-ghost {
+    @apply text-gray-600 dark:text-gray-300;
+    @apply px-4 py-2 rounded-xl font-medium;
+    @apply transition-all duration-200;
+    @apply hover:bg-gray-100 dark:hover:bg-dark-surface;
+  }
+
+  .input {
+    @apply w-full px-4 py-3 rounded-xl;
+    @apply bg-gray-50 dark:bg-dark-surface;
+    @apply border border-gray-200 dark:border-dark-border;
+    @apply text-gray-800 dark:text-gray-200;
+    @apply placeholder:text-gray-400 dark:placeholder:text-gray-500;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500;
+    @apply focus:bg-white dark:focus:bg-dark-card;
+    @apply transition-all duration-200;
+  }
+
+  .input-error {
+    @apply border-red-400 focus:ring-red-400/20 focus:border-red-400;
+  }
+
+  .gradient-primary {
+    @apply bg-gradient-to-br from-primary-600 via-primary-500 to-blue-500;
+  }
+
+  .gradient-accent {
+    @apply bg-gradient-to-br from-accent-500 to-accent-400;
+  }
+
+  .gradient-success {
+    @apply bg-gradient-to-br from-success-500 to-success-400;
+  }
+
+  .gradient-mesh {
+    background: linear-gradient(135deg, #3B82F6 0%, #10B981 50%, #06B6D4 100%);
+    background-size: 200% 200%;
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-accent-500;
+  }
+
+  .text-gradient-hero {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #2563EB 0%, #10B981 100%);
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+}

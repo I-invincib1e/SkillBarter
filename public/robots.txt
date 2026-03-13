@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /settings
+
+Sitemap: https://skillbarter.com/sitemap.xml
+
+User-agent: Googlebot
+Allow: /
+Disallow: /admin
