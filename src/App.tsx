@@ -47,7 +47,7 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
     );
   }
 
-  return !user ? <>{children}</> : <Navigate to="/" />;
+  return !user ? <>{children}</> : <Navigate to="/dashboard" />;
 }
 
 function AppRoutes() {
