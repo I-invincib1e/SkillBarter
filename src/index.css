@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -33,6 +33,57 @@
   .glass-nav {
     @apply bg-white/80 backdrop-blur-2xl border-b border-gray-200/60;
     @apply dark:bg-dark-bg/85 dark:border-dark-border/60;
+  }
+
+  .neo-brutal-header {
+    @apply bg-white dark:bg-dark-bg;
+    @apply border-b-4 border-gray-900 dark:border-white;
+    @apply shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.3)];
+  }
+
+  .neo-brutal-card {
+    @apply bg-white dark:bg-dark-card;
+    @apply border-3 border-gray-900 dark:border-white/80;
+    @apply shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.2)];
+    @apply transition-all duration-200;
+  }
+
+  .neo-brutal-card:hover {
+    @apply shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.3)];
+    @apply -translate-x-0.5 -translate-y-0.5;
+  }
+
+  .neo-brutal-btn {
+    @apply border-3 border-gray-900 dark:border-white;
+    @apply shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.4)];
+    @apply transition-all duration-150;
+    @apply hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.4)];
+    @apply hover:translate-x-0.5 hover:translate-y-0.5;
+    @apply active:shadow-none active:translate-x-1 active:translate-y-1;
+  }
+
+  .neo-brutal-input {
+    @apply border-3 border-gray-900 dark:border-white/80;
+    @apply bg-white dark:bg-dark-surface;
+    @apply focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:focus:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.3)];
+  }
+
+  .cyber-gradient {
+    background: linear-gradient(135deg, #00F5FF 0%, #00D4AA 25%, #FFE600 50%, #FF6B6B 75%, #00F5FF 100%);
+    background-size: 300% 300%;
+    animation: gradientShift 8s ease infinite;
+  }
+
+  .cyber-gradient-text {
+    @apply bg-clip-text text-transparent;
+    background: linear-gradient(135deg, #00F5FF 0%, #00D4AA 50%, #FFE600 100%);
+  }
+
+  .futuristic-glow {
+    box-shadow:
+      0 0 20px rgba(0, 245, 255, 0.3),
+      0 0 40px rgba(0, 245, 255, 0.1),
+      inset 0 0 20px rgba(0, 245, 255, 0.05);
   }
 
   .card {
@@ -111,6 +162,12 @@
     background-size: 200% 200%;
   }
 
+  .gradient-cyber {
+    background: linear-gradient(135deg, #00F5FF 0%, #00D4AA 30%, #3B82F6 70%, #00F5FF 100%);
+    background-size: 200% 200%;
+    animation: gradientShift 6s ease infinite;
+  }
+
   .text-gradient {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-accent-500;
   }
@@ -118,6 +175,44 @@
   .text-gradient-hero {
     @apply bg-clip-text text-transparent;
     background-image: linear-gradient(135deg, #2563EB 0%, #10B981 100%);
+  }
+
+  .parallax-section {
+    transform-style: preserve-3d;
+    perspective: 1000px;
+  }
+
+  .parallax-layer {
+    will-change: transform;
+  }
+
+  .scan-line {
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(0, 245, 255, 0.03) 50%,
+      transparent 100%
+    );
+    animation: scanLine 8s linear infinite;
+  }
+
+  .grid-overlay {
+    background-image:
+      linear-gradient(rgba(0, 245, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 245, 255, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+
+  .noise-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0.02;
+    z-index: 1000;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noise)'/%3E%3C/svg%3E");
   }
 }
 
@@ -137,5 +232,26 @@
 
   .safe-top {
     padding-top: env(safe-area-inset-top);
+  }
+
+  .border-3 {
+    border-width: 3px;
+  }
+
+  .font-space {
+    font-family: 'Space Grotesk', sans-serif;
+  }
+
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+@keyframes scanLine {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100vh);
   }
 }

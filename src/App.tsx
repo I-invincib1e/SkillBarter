@@ -57,9 +57,7 @@ function AppRoutes() {
         path="/"
         element={
           <PublicRoute>
-            <Layout>
-              <Home />
-            </Layout>
+            <Home />
           </PublicRoute>
         }
       />
