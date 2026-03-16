@@ -74,11 +74,8 @@ export function Dashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">
-            Welcome back, {profile.name.split(' ')[0]}
+            Dashboard
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">
-            Here's what's happening with your account
-          </p>
         </div>
         <div className="hidden sm:flex items-center gap-3">
           <Link to="/discover">
@@ -207,15 +204,12 @@ export function Dashboard() {
               <Flame className="w-4 h-4 text-warning-500" />
               <span className="text-sm font-medium">Current Streak</span>
             </div>
-            <div className="flex items-baseline gap-2 mb-2">
+            <div className="flex items-baseline gap-2">
               <span className="text-4xl font-extrabold text-gray-800 dark:text-white tracking-tight">
                 {profile.current_streak}
               </span>
               <span className="text-lg text-gray-400">days</span>
             </div>
-            {profile.current_streak >= 7 && (
-              <Badge variant="clay" color="#F59E0B" icon="Flame">On Fire!</Badge>
-            )}
           </div>
         </Card>
 

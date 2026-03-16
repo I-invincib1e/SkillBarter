@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, User, ArrowRight, Gift, BookOpen, Award, TrendingUp } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, BookOpen, Award, TrendingUp } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Button, Input } from '../components/ui';
 
@@ -80,7 +80,6 @@ export function Signup() {
 
           <div className="grid grid-cols-2 gap-4">
             {[
-              { icon: Gift, label: '10 Free Credits', desc: 'On sign up' },
               { icon: BookOpen, label: '50+ Categories', desc: 'To explore' },
               { icon: Award, label: 'Earn Badges', desc: 'As you help' },
               { icon: TrendingUp, label: 'Build Streaks', desc: 'Stay active' },
@@ -106,24 +105,11 @@ export function Signup() {
 
           <div className="mb-8">
             <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">
-              Create your account
+              Create Account
             </h1>
-            <p className="text-gray-500 dark:text-gray-400">
-              Start exchanging skills with students today
-            </p>
           </div>
 
           <div className="bg-white dark:bg-dark-card rounded-2xl p-8 shadow-soft border border-gray-100 dark:border-dark-border">
-            <div className="flex items-center gap-3 p-3.5 rounded-xl bg-accent-50 dark:bg-accent-900/20 border border-accent-100 dark:border-accent-800/30 mb-6">
-              <div className="p-2 rounded-lg bg-accent-100 dark:bg-accent-900/30">
-                <Gift className="w-5 h-5 text-accent-600" />
-              </div>
-              <div>
-                <p className="font-semibold text-accent-700 dark:text-accent-400 text-sm">Welcome Bonus</p>
-                <p className="text-accent-600 dark:text-accent-500 text-xs">Get 10 free credits when you sign up!</p>
-              </div>
-            </div>
-
             <button
               type="button"
               onClick={handleGoogleSignUp}

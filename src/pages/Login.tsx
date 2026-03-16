@@ -103,11 +103,8 @@ export function Login() {
 
           <div className="mb-8">
             <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">
-              Welcome back
+              Sign In
             </h1>
-            <p className="text-gray-500 dark:text-gray-400">
-              Sign in to continue trading skills
-            </p>
           </div>
 
           <div className="bg-white dark:bg-dark-card rounded-2xl p-8 shadow-soft border border-gray-100 dark:border-dark-border">

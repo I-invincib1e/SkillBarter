@@ -20,7 +20,7 @@ export function FAQ() {
     {
       question: 'How do the credits work?',
       answer:
-        'Every completed session earns you credits. You earn credits when you help someone, and you spend credits when you receive help. The number of credits depends on the skill level and duration of the session. Your first signup bonus gives you 10 free credits to get started.',
+        'Every completed session earns you credits. You earn credits when you help someone, and you spend credits when you receive help. The number of credits depends on the skill level and duration of the session.',
     },
     {
       question: 'Is it safe to use SkillBarter?',
@@ -55,7 +55,7 @@ export function FAQ() {
     {
       question: 'What if I don\'t have enough credits?',
       answer:
-        'You can start earning credits immediately by creating listings for skills you can teach. You get a 10 credit signup bonus to get started. As you complete sessions, you\'ll earn more credits to spend on other services.',
+        'You can start earning credits immediately by creating listings for skills you can teach. As you complete sessions, you\'ll earn more credits to spend on other services.',
     },
   ];
 
