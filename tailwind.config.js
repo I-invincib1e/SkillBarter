@@ -96,6 +96,9 @@ export default {
         'confetti': 'confetti 0.5s ease-out forwards',
         'credit-pop': 'creditPop 0.5s ease-out forwards',
         'blob': 'blob 7s ease-in-out infinite',
+        'ticker': 'ticker 40s linear infinite',
+        'spin-slow': 'spin 12s linear infinite',
+        'pulse-ring': 'pulseRing 2s ease-out infinite',
       },
       keyframes: {
         float: {
@@ -156,6 +159,15 @@ export default {
           '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
           '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
           '100%': { transform: 'translate(0, 0) scale(1)' },
+        },
+        ticker: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
+        },
+        pulseRing: {
+          '0%': { transform: 'scale(1)', opacity: '0.8' },
+          '50%': { transform: 'scale(1.15)', opacity: '0.4' },
+          '100%': { transform: 'scale(1)', opacity: '0.8' },
         },
       },
     },

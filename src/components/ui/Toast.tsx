@@ -78,8 +78,8 @@ function ToastItem({
   return (
     <div
       className={`
-        flex items-center gap-3 px-4 py-3 rounded-2xl border
-        shadow-soft-lg backdrop-blur-sm animate-slide-up min-w-[300px]
+        flex items-center gap-3 px-4 py-3 rounded-lg border-2
+        shadow-[3px_3px_0px_0px_rgba(0,0,0,0.1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,0.05)] backdrop-blur-sm animate-slide-up min-w-[300px]
         ${backgrounds[toast.type]}
       `}
     >

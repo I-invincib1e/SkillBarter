@@ -49,42 +49,45 @@ export function Login() {
 
   return (
     <div className="min-h-screen flex -mt-16">
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-700 to-blue-900">
-        <div className="absolute inset-0">
-          <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-primary-400/20 rounded-full blur-3xl animate-blob" />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent-400/15 rounded-full blur-3xl animate-blob" style={{ animationDelay: '2s' }} />
-          <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-blue-400/10 rounded-full blur-3xl animate-blob" style={{ animationDelay: '4s' }} />
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gray-900 dark:bg-black">
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,212,170,0.15)_1px,transparent_1px),linear-gradient(rgba(0,212,170,0.15)_1px,transparent_1px)] bg-[size:40px_40px]" />
         </div>
+        <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-400/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-400/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
 
         <div className="relative z-10 flex flex-col justify-center px-12 xl:px-20">
           <div className="flex items-center gap-3 mb-12">
-            <div className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center border border-white/20">
-              <span className="text-white font-bold text-lg">SB</span>
+            <div className="w-12 h-12 rounded-lg bg-white flex items-center justify-center border-3 border-white">
+              <Zap className="w-6 h-6 text-gray-900" />
             </div>
-            <span className="text-white font-bold text-2xl">SkillBarter</span>
+            <div>
+              <span className="text-white font-space font-bold text-2xl">SkillBarter</span>
+              <div className="text-[9px] font-mono text-gray-500 tracking-[0.2em]">LEARN // EARN // GROW</div>
+            </div>
           </div>
 
-          <h2 className="text-4xl xl:text-5xl font-extrabold text-white leading-tight mb-6">
+          <h2 className="text-4xl xl:text-5xl font-space font-bold text-white leading-tight mb-6">
             Trade skills,<br />
-            <span className="text-accent-300">grow together.</span>
+            <span className="text-cyan-400">grow together.</span>
           </h2>
-          <p className="text-lg text-blue-100/80 mb-12 max-w-md leading-relaxed">
+          <p className="text-lg text-gray-400 mb-12 max-w-md font-space leading-relaxed">
             Connect with fellow students, exchange expertise, and build your skills through peer-to-peer learning.
           </p>
 
-          <div className="space-y-5">
+          <div className="space-y-4">
             {[
-              { icon: Sparkles, color: 'text-accent-300', title: 'Credit-Based Exchange', desc: 'Earn credits by helping others, spend them to get help' },
-              { icon: Users, color: 'text-blue-300', title: 'Peer Learning', desc: 'Connect with skilled students in your university' },
-              { icon: Zap, color: 'text-yellow-300', title: 'Earn Badges & Streaks', desc: 'Stay consistent and unlock achievements' },
-            ].map((item, i) => (
-              <div key={item.title} className="flex items-center gap-4 animate-fade-in-up" style={{ animationDelay: `${0.2 + i * 0.2}s`, animationFillMode: 'backwards' }}>
-                <div className="w-11 h-11 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/10">
+              { icon: Sparkles, color: 'text-cyan-400', title: 'Credit-Based Exchange', desc: 'Earn credits by helping others, spend them to get help' },
+              { icon: Users, color: 'text-emerald-400', title: 'Peer Learning', desc: 'Connect with skilled students in your university' },
+              { icon: Zap, color: 'text-yellow-400', title: 'Earn Badges & Streaks', desc: 'Stay consistent and unlock achievements' },
+            ].map((item) => (
+              <div key={item.title} className="flex items-center gap-4 p-4 bg-white/5 border-2 border-white/10 rounded-xl hover:border-cyan-400/30 transition-colors">
+                <div className="w-11 h-11 rounded-lg bg-white/10 flex items-center justify-center border border-white/10">
                   <item.icon className={`w-5 h-5 ${item.color}`} />
                 </div>
                 <div>
-                  <p className="text-white font-semibold">{item.title}</p>
-                  <p className="text-blue-200/60 text-sm">{item.desc}</p>
+                  <p className="text-white font-space font-semibold">{item.title}</p>
+                  <p className="text-gray-500 text-sm font-space">{item.desc}</p>
                 </div>
               </div>
             ))}
@@ -95,24 +98,24 @@ export function Login() {
       <div className="flex-1 flex items-center justify-center px-6 py-12 bg-gray-50 dark:bg-dark-bg">
         <div className="w-full max-w-md animate-fade-in-up">
           <div className="lg:hidden flex items-center gap-3 mb-10 justify-center">
-            <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center">
-              <span className="text-white font-bold text-sm">SB</span>
+            <div className="w-10 h-10 rounded-lg bg-gray-900 dark:bg-white flex items-center justify-center border-2 border-gray-900 dark:border-white">
+              <Zap className="w-5 h-5 text-cyan-400 dark:text-gray-900" />
             </div>
-            <span className="font-bold text-xl text-gray-800 dark:text-white">SkillBarter</span>
+            <span className="font-space font-bold text-xl text-gray-800 dark:text-white">SkillBarter</span>
           </div>
 
           <div className="mb-8">
-            <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">
+            <h1 className="text-3xl font-space font-bold text-gray-900 dark:text-white mb-2">
               Sign In
             </h1>
           </div>
 
-          <div className="bg-white dark:bg-dark-card rounded-2xl p-8 shadow-soft border border-gray-100 dark:border-dark-border">
+          <div className="bg-white dark:bg-dark-card rounded-xl p-8 border-2 border-gray-200 dark:border-dark-border shadow-sm">
             <button
               type="button"
               onClick={handleGoogleSignIn}
               disabled={googleLoading}
-              className="w-full flex items-center justify-center gap-3 px-5 py-3.5 rounded-xl border-2 border-gray-200 dark:border-dark-border bg-white dark:bg-dark-surface text-gray-700 dark:text-gray-200 font-semibold hover:bg-gray-50 dark:hover:bg-dark-card transition-all duration-200 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-soft active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-3 px-5 py-3.5 rounded-lg border-2 border-gray-200 dark:border-dark-border bg-white dark:bg-dark-surface text-gray-700 dark:text-gray-200 font-space font-semibold hover:bg-gray-50 dark:hover:bg-dark-card transition-all duration-200 hover:border-gray-300 dark:hover:border-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {googleLoading ? (
                 <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
@@ -135,7 +138,7 @@ export function Login() {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               {error && (
-                <div className="p-3.5 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 text-red-600 dark:text-red-400 text-sm font-medium animate-slide-up">
+                <div className="p-3.5 rounded-lg bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800/40 text-red-600 dark:text-red-400 text-sm font-medium animate-slide-up">
                   {error}
                 </div>
               )}

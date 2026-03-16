@@ -50,18 +50,19 @@ export function Modal({
         className={`
           relative w-full ${sizes[size]}
           bg-white dark:bg-dark-card
-          rounded-2xl shadow-soft-xl border border-gray-100 dark:border-dark-border
+          rounded-xl border-3 border-gray-900 dark:border-white/30
+          shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.15)]
           animate-scale-in
         `}
       >
         {title && (
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-dark-border">
+          <div className="flex items-center justify-between px-6 py-4 border-b-2 border-gray-900 dark:border-white/20">
             <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">
               {title}
             </h2>
             <button
               onClick={onClose}
-              className="p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-dark-surface transition-all duration-200"
+              className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-dark-surface transition-all duration-200"
             >
               <X className="w-5 h-5" />
             </button>

@@ -20,14 +20,14 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           <select
             ref={ref}
             className={`
-              w-full px-4 py-3 rounded-xl appearance-none
+              w-full px-4 py-3 rounded-lg appearance-none
               bg-gray-50 dark:bg-dark-surface
-              border border-gray-200 dark:border-dark-border
+              border-2 border-gray-200 dark:border-dark-border
               text-gray-800 dark:text-gray-200
-              focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500
+              focus:outline-none focus:border-gray-900 dark:focus:border-white/50
               focus:bg-white dark:focus:bg-dark-card
               transition-all duration-200
-              ${error ? 'border-red-400 focus:ring-red-400/30 focus:border-red-400' : ''}
+              ${error ? 'border-red-400 focus:border-red-400' : ''}
               ${className}
             `}
             {...props}

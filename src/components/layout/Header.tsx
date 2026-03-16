@@ -42,10 +42,10 @@ export function Header() {
           <div className="flex items-center gap-6 md:gap-10">
             <Link to={user ? "/dashboard" : "/"} className="flex items-center gap-3 group">
               <div className="relative">
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-900 dark:bg-white flex items-center justify-center transition-all duration-200 group-hover:rotate-3 border-3 border-gray-900 dark:border-white shadow-[3px_3px_0px_0px_rgba(0,212,170,1)]">
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-900 dark:bg-white flex items-center justify-center rounded-lg transition-all duration-200 group-hover:rotate-3 border-3 border-gray-900 dark:border-white shadow-[3px_3px_0px_0px_rgba(0,212,170,1)]">
                   <Zap className="w-5 h-5 md:w-6 md:h-6 text-cyan-400 dark:text-gray-900" />
                 </div>
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-cyan-400 rounded-full animate-pulse" />
+                <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-cyan-400 rounded-full animate-pulse" />
               </div>
               <div className="hidden sm:block">
                 <span className="font-space font-bold text-xl md:text-2xl text-gray-900 dark:text-white tracking-tight">
@@ -59,7 +59,7 @@ export function Header() {
 
             {user && (
               <nav className="hidden md:flex items-center">
-                <div className="flex items-center bg-gray-100 dark:bg-dark-surface rounded-none border-2 border-gray-900 dark:border-white/20">
+                <div className="flex items-center bg-gray-100 dark:bg-dark-surface rounded-lg border-2 border-gray-900 dark:border-white/20 overflow-hidden">
                   {navLinks.map((link, index) => {
                     const isActive = location.pathname === link.path;
                     return (
@@ -88,7 +88,7 @@ export function Header() {
           <div className="flex items-center gap-2 md:gap-3">
             <button
               onClick={toggleTheme}
-              className="p-2.5 md:p-3 bg-gray-100 dark:bg-dark-surface border-2 border-gray-900 dark:border-white/30 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-dark-card transition-all duration-200 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5"
+              className="p-2.5 md:p-3 bg-gray-100 dark:bg-dark-surface rounded-lg border-2 border-gray-900 dark:border-white/30 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-dark-card transition-all duration-200 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5"
               aria-label="Toggle theme"
             >
               {theme === 'light' ? <Moon className="w-4 h-4 md:w-5 md:h-5" /> : <Sun className="w-4 h-4 md:w-5 md:h-5" />}
@@ -98,7 +98,7 @@ export function Header() {
               <>
                 <Link
                   to="/wallet"
-                  className="hidden sm:flex items-center gap-2 px-4 py-2.5 bg-cyan-400 dark:bg-cyan-500 text-gray-900 font-space font-bold text-sm border-2 border-gray-900 dark:border-gray-900 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-0.5 hover:translate-y-0.5 transition-all duration-150"
+                  className="hidden sm:flex items-center gap-2 px-4 py-2.5 bg-cyan-400 dark:bg-cyan-500 text-gray-900 font-space font-bold text-sm rounded-lg border-2 border-gray-900 dark:border-gray-900 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-0.5 hover:translate-y-0.5 transition-all duration-150"
                 >
                   <Wallet className="w-4 h-4" />
                   <span className="font-mono">{wallet?.balance ?? 0}</span>
@@ -108,7 +108,7 @@ export function Header() {
                 <div className="relative">
                   <button
                     onClick={() => setShowUserMenu(!showUserMenu)}
-                    className="flex items-center gap-2 p-1.5 border-2 border-gray-900 dark:border-white/30 bg-white dark:bg-dark-card hover:bg-gray-50 dark:hover:bg-dark-surface transition-all duration-200 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.2)]"
+                    className="flex items-center gap-2 p-1.5 rounded-lg border-2 border-gray-900 dark:border-white/30 bg-white dark:bg-dark-card hover:bg-gray-50 dark:hover:bg-dark-surface transition-all duration-200 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.2)]"
                   >
                     <Avatar src={profile?.avatar_url} name={profile?.name || 'User'} size="sm" />
                     <ChevronDown className={`w-4 h-4 text-gray-400 hidden sm:block transition-transform duration-200 ${showUserMenu ? 'rotate-180' : ''}`} />
@@ -117,7 +117,7 @@ export function Header() {
                   {showUserMenu && (
                     <>
                       <div className="fixed inset-0" onClick={() => setShowUserMenu(false)} />
-                      <div className="absolute right-0 mt-3 w-64 bg-white dark:bg-dark-card border-3 border-gray-900 dark:border-white/50 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.2)] animate-scale-in overflow-hidden">
+                      <div className="absolute right-0 mt-3 w-64 bg-white dark:bg-dark-card rounded-xl border-3 border-gray-900 dark:border-white/50 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.2)] animate-scale-in overflow-hidden">
                         <div className="px-4 py-4 border-b-2 border-gray-900 dark:border-white/20 bg-gray-50 dark:bg-dark-surface">
                           <p className="font-space font-bold text-gray-900 dark:text-white">{profile?.name}</p>
                           <p className="text-xs font-mono text-gray-500 truncate mt-1">{user.email}</p>
@@ -166,7 +166,7 @@ export function Header() {
 
                 <button
                   onClick={() => setShowMobileMenu(!showMobileMenu)}
-                  className="md:hidden p-2.5 bg-gray-100 dark:bg-dark-surface border-2 border-gray-900 dark:border-white/30 text-gray-700 dark:text-gray-200 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.2)]"
+                  className="md:hidden p-2.5 bg-gray-100 dark:bg-dark-surface rounded-lg border-2 border-gray-900 dark:border-white/30 text-gray-700 dark:text-gray-200 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.2)]"
                 >
                   {showMobileMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                 </button>
@@ -183,7 +183,7 @@ export function Header() {
                   </Button>
                 </Link>
                 <Link to="/signup">
-                  <button className="px-4 md:px-6 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-space font-bold text-sm border-2 border-gray-900 dark:border-white shadow-[3px_3px_0px_0px_rgba(0,212,170,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,212,170,1)] hover:translate-x-0.5 hover:translate-y-0.5 transition-all duration-150">
+                  <button className="px-4 md:px-6 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-space font-bold text-sm rounded-lg border-2 border-gray-900 dark:border-white shadow-[3px_3px_0px_0px_rgba(0,212,170,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,212,170,1)] hover:translate-x-0.5 hover:translate-y-0.5 transition-all duration-150">
                     Get Started
                   </button>
                 </Link>

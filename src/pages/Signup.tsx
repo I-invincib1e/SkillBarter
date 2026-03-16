@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, User, ArrowRight, BookOpen, Award, TrendingUp } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, BookOpen, Award, TrendingUp, Zap } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Button, Input } from '../components/ui';
 
@@ -55,26 +55,29 @@ export function Signup() {
 
   return (
     <div className="min-h-screen flex -mt-16">
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-accent-600 via-accent-700 to-teal-900">
-        <div className="absolute inset-0">
-          <div className="absolute top-1/3 left-1/3 w-80 h-80 bg-accent-400/20 rounded-full blur-3xl animate-blob" />
-          <div className="absolute bottom-1/3 right-1/4 w-72 h-72 bg-teal-400/15 rounded-full blur-3xl animate-blob" style={{ animationDelay: '3s' }} />
-          <div className="absolute top-2/3 left-1/4 w-56 h-56 bg-emerald-400/10 rounded-full blur-3xl animate-blob" style={{ animationDelay: '5s' }} />
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gray-900 dark:bg-black">
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,212,170,0.15)_1px,transparent_1px),linear-gradient(rgba(0,212,170,0.15)_1px,transparent_1px)] bg-[size:40px_40px]" />
         </div>
+        <div className="absolute top-0 left-0 w-96 h-96 bg-emerald-400/10 rounded-full blur-3xl -translate-y-1/2 -translate-x-1/2" />
+        <div className="absolute bottom-0 right-0 w-64 h-64 bg-cyan-400/10 rounded-full blur-3xl translate-y-1/2 translate-x-1/2" />
 
         <div className="relative z-10 flex flex-col justify-center px-12 xl:px-20">
           <div className="flex items-center gap-3 mb-12">
-            <div className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center border border-white/20">
-              <span className="text-white font-bold text-lg">SB</span>
+            <div className="w-12 h-12 rounded-lg bg-white flex items-center justify-center border-3 border-white">
+              <Zap className="w-6 h-6 text-gray-900" />
             </div>
-            <span className="text-white font-bold text-2xl">SkillBarter</span>
+            <div>
+              <span className="text-white font-space font-bold text-2xl">SkillBarter</span>
+              <div className="text-[9px] font-mono text-gray-500 tracking-[0.2em]">LEARN // EARN // GROW</div>
+            </div>
           </div>
 
-          <h2 className="text-4xl xl:text-5xl font-extrabold text-white leading-tight mb-6">
+          <h2 className="text-4xl xl:text-5xl font-space font-bold text-white leading-tight mb-6">
             Start your<br />
-            <span className="text-emerald-200">learning journey.</span>
+            <span className="text-emerald-400">learning journey.</span>
           </h2>
-          <p className="text-lg text-emerald-100/80 mb-12 max-w-md leading-relaxed">
+          <p className="text-lg text-gray-400 mb-12 max-w-md font-space leading-relaxed">
             Join a thriving community of students who teach, learn, and grow together through skill exchange.
           </p>
 
@@ -83,11 +86,11 @@ export function Signup() {
               { icon: BookOpen, label: '50+ Categories', desc: 'To explore' },
               { icon: Award, label: 'Earn Badges', desc: 'As you help' },
               { icon: TrendingUp, label: 'Build Streaks', desc: 'Stay active' },
-            ].map((item, i) => (
-              <div key={item.label} className="p-4 rounded-2xl bg-white/[0.08] backdrop-blur-sm border border-white/10 animate-fade-in-up" style={{ animationDelay: `${0.2 + i * 0.15}s`, animationFillMode: 'backwards' }}>
-                <item.icon className="w-6 h-6 text-emerald-200 mb-2" />
-                <p className="text-white font-semibold text-sm">{item.label}</p>
-                <p className="text-emerald-200/50 text-xs">{item.desc}</p>
+            ].map((item) => (
+              <div key={item.label} className="p-4 rounded-xl bg-white/5 border-2 border-white/10 hover:border-emerald-400/30 transition-colors">
+                <item.icon className="w-6 h-6 text-emerald-400 mb-2" />
+                <p className="text-white font-space font-semibold text-sm">{item.label}</p>
+                <p className="text-gray-500 text-xs font-space">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -97,24 +100,24 @@ export function Signup() {
       <div className="flex-1 flex items-center justify-center px-6 py-12 bg-gray-50 dark:bg-dark-bg">
         <div className="w-full max-w-md animate-fade-in-up">
           <div className="lg:hidden flex items-center gap-3 mb-10 justify-center">
-            <div className="w-10 h-10 rounded-xl gradient-accent flex items-center justify-center">
-              <span className="text-white font-bold text-sm">SB</span>
+            <div className="w-10 h-10 rounded-lg bg-gray-900 dark:bg-white flex items-center justify-center border-2 border-gray-900 dark:border-white">
+              <Zap className="w-5 h-5 text-cyan-400 dark:text-gray-900" />
             </div>
-            <span className="font-bold text-xl text-gray-800 dark:text-white">SkillBarter</span>
+            <span className="font-space font-bold text-xl text-gray-800 dark:text-white">SkillBarter</span>
           </div>
 
           <div className="mb-8">
-            <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">
+            <h1 className="text-3xl font-space font-bold text-gray-900 dark:text-white mb-2">
               Create Account
             </h1>
           </div>
 
-          <div className="bg-white dark:bg-dark-card rounded-2xl p-8 shadow-soft border border-gray-100 dark:border-dark-border">
+          <div className="bg-white dark:bg-dark-card rounded-xl p-8 border-2 border-gray-200 dark:border-dark-border shadow-sm">
             <button
               type="button"
               onClick={handleGoogleSignUp}
               disabled={googleLoading}
-              className="w-full flex items-center justify-center gap-3 px-5 py-3.5 rounded-xl border-2 border-gray-200 dark:border-dark-border bg-white dark:bg-dark-surface text-gray-700 dark:text-gray-200 font-semibold hover:bg-gray-50 dark:hover:bg-dark-card transition-all duration-200 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-soft active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-3 px-5 py-3.5 rounded-lg border-2 border-gray-200 dark:border-dark-border bg-white dark:bg-dark-surface text-gray-700 dark:text-gray-200 font-space font-semibold hover:bg-gray-50 dark:hover:bg-dark-card transition-all duration-200 hover:border-gray-300 dark:hover:border-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {googleLoading ? (
                 <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
@@ -137,7 +140,7 @@ export function Signup() {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               {error && (
-                <div className="p-3.5 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 text-red-600 dark:text-red-400 text-sm font-medium animate-slide-up">
+                <div className="p-3.5 rounded-lg bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800/40 text-red-600 dark:text-red-400 text-sm font-medium animate-slide-up">
                   {error}
                 </div>
               )}
