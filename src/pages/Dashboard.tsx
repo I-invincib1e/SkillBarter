@@ -6,7 +6,6 @@ import {
   FileText,
   Flame,
   Award,
-  ArrowRight,
   Plus,
   Search,
   Zap,
@@ -77,18 +76,18 @@ export function Dashboard() {
     <div className="space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
             Dashboard
           </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
             Welcome back, {profile.name?.split(' ')[0]}
           </p>
         </div>
-        <div className="hidden sm:flex items-center gap-3">
+        <div className="hidden sm:flex items-center gap-2">
           <Link to="/discover">
             <Button variant="secondary" size="sm">
               <Search className="w-4 h-4" />
-              Browse Help
+              Browse
             </Button>
           </Link>
           <Link to="/listings/create">
@@ -102,59 +101,55 @@ export function Dashboard() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Link to="/wallet" className="lg:col-span-2">
-          <Card hover className="h-full bg-gradient-to-br from-primary-600 via-primary-500 to-blue-500 text-white border-0 dark:border-0 overflow-hidden relative group">
-            <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-xl group-hover:blur-2xl transition-all" />
-            <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2 blur-lg" />
+          <Card hover className="h-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 dark:from-gray-900 dark:via-gray-800/90 dark:to-gray-900 text-white border-0 dark:border-white/5 overflow-hidden relative group">
+            <div className="absolute top-0 right-0 w-40 h-40 bg-cyan-500/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-emerald-500/10 rounded-full translate-y-1/2 -translate-x-1/2 blur-2xl" />
 
             <div className="relative space-y-4">
               <div className="flex items-start justify-between">
                 <div>
-                  <div className="flex items-center gap-2 text-white/70 mb-1.5">
+                  <div className="flex items-center gap-2 text-white/60 mb-1.5">
                     <Wallet className="w-4 h-4" />
                     <span className="text-sm font-medium">Wallet Balance</span>
                   </div>
-                  <p className="text-4xl font-extrabold tracking-tight">
+                  <p className="text-4xl font-bold tracking-tight">
                     {wallet?.balance ?? 0}
-                    <span className="text-lg ml-1.5 opacity-70 font-semibold">credits</span>
+                    <span className="text-lg ml-1.5 opacity-50 font-medium">credits</span>
                   </p>
                 </div>
                 <RingChart
                   percentage={earnedPercentage}
-                  size={75}
-                  strokeWidth={6}
-                  color="#ffffff"
-                  bgColor="rgba(255,255,255,0.2)"
+                  size={70}
+                  strokeWidth={5}
+                  color="#22D3EE"
+                  bgColor="rgba(255,255,255,0.1)"
                   showLabel={false}
                 />
               </div>
 
-              <div className="flex items-center gap-3 pt-2 border-t border-white/15">
-                <div className="flex items-center gap-2 text-sm">
-                  <Lock className="w-3.5 h-3.5 opacity-60" />
-                  <span className="opacity-70">Locked:</span>
-                  <span className="font-semibold">{wallet?.locked_credits ?? 0}</span>
+              <div className="grid grid-cols-3 gap-3 pt-3 border-t border-white/10">
+                <div>
+                  <div className="flex items-center gap-1.5 text-white/40 mb-0.5">
+                    <Lock className="w-3 h-3" />
+                    <span className="text-[11px]">Locked</span>
+                  </div>
+                  <p className="text-sm font-semibold">{wallet?.locked_credits ?? 0}</p>
+                </div>
+                <div>
+                  <div className="flex items-center gap-1.5 text-emerald-400/70 mb-0.5">
+                    <TrendingUp className="w-3 h-3" />
+                    <span className="text-[11px]">Earned</span>
+                  </div>
+                  <p className="text-sm font-semibold">{wallet?.total_earned ?? 0}</p>
+                </div>
+                <div>
+                  <div className="flex items-center gap-1.5 text-red-400/70 mb-0.5">
+                    <ArrowDownRight className="w-3 h-3" />
+                    <span className="text-[11px]">Spent</span>
+                  </div>
+                  <p className="text-sm font-semibold">{wallet?.total_spent ?? 0}</p>
                 </div>
               </div>
-
-              <div className="flex flex-col gap-2 pt-2 border-t border-white/15">
-                <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-1.5">
-                    <TrendingUp className="w-3.5 h-3.5 text-green-300" />
-                    <span className="opacity-70">Earned:</span>
-                    <span className="font-bold">{wallet?.total_earned ?? 0}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <ArrowDownRight className="w-3.5 h-3.5 text-red-300" />
-                    <span className="opacity-70">Spent:</span>
-                    <span className="font-bold">{wallet?.total_spent ?? 0}</span>
-                  </div>
-                </div>
-              </div>
-
-              <Link to="/wallet" className="flex items-center justify-between text-white/80 hover:text-white transition-colors text-xs font-medium group/action pt-2">
-                <span>View Transaction History</span>
-                <ChevronRight className="w-4 h-4 group-hover/action:translate-x-0.5 transition-transform" />
-              </Link>
             </div>
           </Card>
         </Link>
@@ -190,7 +185,7 @@ export function Dashboard() {
             </Link>
           ) : (
             <div className="h-full flex flex-col items-center justify-center text-center py-4">
-              <div className="w-12 h-12 rounded-2xl bg-gray-100 dark:bg-dark-surface flex items-center justify-center mb-3">
+              <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-white/5 flex items-center justify-center mb-3">
                 <Calendar className="w-6 h-6 text-gray-300 dark:text-gray-600" />
               </div>
               <p className="text-gray-600 dark:text-gray-300 text-sm font-medium mb-1">No upcoming sessions</p>
@@ -208,7 +203,7 @@ export function Dashboard() {
             <span className="text-sm font-medium">My Listings</span>
           </div>
           <div className="flex-1">
-            <p className="text-3xl font-extrabold text-gray-800 dark:text-white tracking-tight">
+            <p className="text-3xl font-bold text-gray-800 dark:text-white tracking-tight">
               {myListingsCount}
             </p>
             <p className="text-xs text-gray-400 mt-1">Active offering{myListingsCount !== 1 ? 's' : ''}</p>
@@ -222,14 +217,14 @@ export function Dashboard() {
         </Card>
 
         <Card className="relative overflow-hidden h-full flex flex-col">
-          <div className="absolute inset-0 bg-gradient-to-br from-warning-400/10 to-transparent dark:from-warning-500/5" />
+          <div className="absolute inset-0 bg-gradient-to-br from-orange-100/60 to-transparent dark:from-orange-500/5 dark:to-transparent" />
           <div className="relative flex-1">
             <div className="flex items-center gap-2 text-gray-400 mb-3">
-              <Flame className="w-4 h-4 text-warning-500" />
+              <Flame className="w-4 h-4 text-orange-500" />
               <span className="text-sm font-medium">Current Streak</span>
             </div>
             <div className="flex items-baseline gap-2 mb-2">
-              <span className="text-4xl font-extrabold text-gray-800 dark:text-white tracking-tight">
+              <span className="text-4xl font-bold text-gray-800 dark:text-white tracking-tight">
                 {profile.current_streak}
               </span>
               <span className="text-sm text-gray-400">days</span>
@@ -252,7 +247,7 @@ export function Dashboard() {
               <Award className="w-4 h-4" />
               <span className="text-sm font-medium">Badges</span>
             </div>
-            <Link to="/badges" className="text-xs text-primary-600 dark:text-primary-400 font-semibold hover:underline flex items-center gap-1">
+            <Link to="/badges" className="text-xs text-cyan-600 dark:text-cyan-400 font-medium hover:underline flex items-center gap-0.5">
               All
               <ChevronRight className="w-3 h-3" />
             </Link>
@@ -265,7 +260,7 @@ export function Dashboard() {
             </div>
           ) : (
             <div className="text-center py-3">
-              <div className="w-8 h-8 rounded-xl bg-gray-100 dark:bg-dark-surface flex items-center justify-center mx-auto mb-2">
+              <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center mx-auto mb-2">
                 <Sparkles className="w-4 h-4 text-gray-400" />
               </div>
               <p className="text-xs text-gray-400">Complete sessions to earn achievements</p>
@@ -275,28 +270,27 @@ export function Dashboard() {
 
         <Card className="lg:col-span-2">
           <div className="flex items-center justify-between mb-3.5">
-            <h3 className="font-semibold text-gray-800 dark:text-white flex items-center gap-2">
-              <span>Recent Activity</span>
+            <h3 className="font-semibold text-gray-800 dark:text-white flex items-center gap-2 text-sm">
+              Recent Activity
               {recentTransactions.length > 0 && (
-                <span className="text-xs bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 px-2 py-0.5 rounded-full font-medium">
+                <span className="text-[11px] bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-full font-medium">
                   {recentTransactions.length}
                 </span>
               )}
             </h3>
-            <Link to="/wallet" className="text-xs text-primary-600 dark:text-primary-400 font-semibold hover:underline flex items-center gap-1 group">
-              <span className="group-hover:inline hidden sm:inline">Full History</span>
-              <span className="group-hover:hidden sm:hidden">View</span>
-              <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            <Link to="/wallet" className="text-xs text-cyan-600 dark:text-cyan-400 font-medium hover:underline flex items-center gap-0.5 group">
+              History
+              <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
             </Link>
           </div>
           {recentTransactions.length > 0 ? (
-            <div className="space-y-1 max-h-64 overflow-y-auto">
+            <div className="space-y-0.5 max-h-64 overflow-y-auto">
               {recentTransactions.map((tx) => {
                 const isPositive = tx.type === 'earn' || tx.type === 'signup_bonus' || tx.type === 'unlock';
                 return (
-                  <div key={tx.id} className="flex items-center justify-between py-2.5 px-2 -mx-2 hover:bg-gray-50 dark:hover:bg-dark-surface rounded transition-colors">
+                  <div key={tx.id} className="flex items-center justify-between py-2.5 px-2 -mx-2 hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors">
                     <div className="flex items-center gap-3 flex-1">
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${isPositive ? 'bg-accent-50 dark:bg-accent-900/20 text-accent-600' : 'bg-red-50 dark:bg-red-900/20 text-red-500'}`}>
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${isPositive ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600' : 'bg-red-50 dark:bg-red-500/10 text-red-500'}`}>
                         {isPositive ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -310,7 +304,7 @@ export function Dashboard() {
                         </p>
                       </div>
                     </div>
-                    <span className={`font-bold text-sm flex-shrink-0 ml-2 ${isPositive ? 'text-accent-600' : 'text-red-500'}`}>
+                    <span className={`font-semibold text-sm flex-shrink-0 ml-2 ${isPositive ? 'text-emerald-600' : 'text-red-500'}`}>
                       {isPositive ? '+' : '-'}{Math.abs(tx.credits)}
                     </span>
                   </div>
@@ -319,7 +313,7 @@ export function Dashboard() {
             </div>
           ) : (
             <div className="text-center py-8">
-              <div className="w-10 h-10 rounded-2xl bg-gray-100 dark:bg-dark-surface flex items-center justify-center mx-auto mb-2">
+              <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-white/5 flex items-center justify-center mx-auto mb-2">
                 <Wallet className="w-5 h-5 text-gray-400" />
               </div>
               <p className="text-sm text-gray-400">No transactions yet</p>

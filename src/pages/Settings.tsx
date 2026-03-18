@@ -23,13 +23,13 @@ import { SettingsPreview } from './settings/SettingsPreview';
 
 type SettingsTab = 'general' | 'profile' | 'skills' | 'availability' | 'security' | 'transactions';
 
-const TABS: { id: SettingsTab; label: string; code: string; icon: typeof User }[] = [
-  { id: 'general', label: 'General', code: 'GEN', icon: User },
-  { id: 'profile', label: 'Public Profile', code: 'PRF', icon: Eye },
-  { id: 'skills', label: 'Skills', code: 'SKL', icon: Layers },
-  { id: 'availability', label: 'Availability', code: 'AVL', icon: Clock },
-  { id: 'security', label: 'Security', code: 'SEC', icon: Shield },
-  { id: 'transactions', label: 'Transactions', code: 'TXN', icon: Receipt },
+const TABS: { id: SettingsTab; label: string; icon: typeof User }[] = [
+  { id: 'general', label: 'General', icon: User },
+  { id: 'profile', label: 'Public Profile', icon: Eye },
+  { id: 'skills', label: 'Skills', icon: Layers },
+  { id: 'availability', label: 'Availability', icon: Clock },
+  { id: 'security', label: 'Security', icon: Shield },
+  { id: 'transactions', label: 'Transactions', icon: Receipt },
 ];
 
 export function Settings() {
@@ -194,12 +194,12 @@ export function Settings() {
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate(-1)}
-            className="p-2 rounded-lg text-gray-400 hover:text-gray-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-dark-surface transition-colors"
+            className="p-2 rounded-lg text-gray-400 hover:text-gray-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
               Settings
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -224,10 +224,10 @@ export function Settings() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-3.5 py-2.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all duration-150 border-2 ${
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-150 ${
                 activeTab === tab.id
-                  ? 'border-gray-900 dark:border-white/50 bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-[2px_2px_0px_0px_rgba(0,212,170,1)]'
-                  : 'border-gray-200 dark:border-dark-border text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-600'
+                  ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
+                  : 'bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400'
               }`}
             >
               <tab.icon className="w-3.5 h-3.5" />
@@ -238,21 +238,18 @@ export function Settings() {
       </div>
 
       <div className="flex gap-6">
-        <nav className="hidden md:block w-56 flex-shrink-0">
-          <div className="sticky top-24 space-y-1">
+        <nav className="hidden md:block w-52 flex-shrink-0">
+          <div className="sticky top-24 space-y-0.5">
             {TABS.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-150 text-left border-2 ${
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 text-left ${
                   activeTab === tab.id
-                    ? 'border-gray-900 dark:border-white/50 bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-[3px_3px_0px_0px_rgba(0,212,170,1)]'
-                    : 'border-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-dark-surface hover:text-gray-900 dark:hover:text-white'
+                    ? 'bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white'
+                    : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
-                <span className={`font-mono text-[10px] ${activeTab === tab.id ? 'text-cyan-300 dark:text-cyan-600' : 'text-gray-400'}`}>
-                  [{tab.code}]
-                </span>
                 <tab.icon className="w-4 h-4" />
                 {tab.label}
               </button>
@@ -290,7 +287,7 @@ export function Settings() {
 
       {showSaveBar && hasChanges && (
         <div className="fixed bottom-0 left-0 right-0 md:bottom-4 md:left-auto md:right-4 md:w-auto z-40">
-          <div className="bg-white dark:bg-dark-card border-t-2 md:border-2 border-gray-900 dark:border-white/30 md:rounded-xl shadow-lg md:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:md:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.15)] p-4 flex items-center gap-4">
+          <div className="bg-white dark:bg-dark-card border-t md:border border-gray-200 dark:border-white/10 md:rounded-xl shadow-lg p-4 flex items-center gap-4">
             <div className="flex-1 lg:flex-none">
               <p className="text-sm font-semibold text-gray-800 dark:text-white">
                 Unsaved changes

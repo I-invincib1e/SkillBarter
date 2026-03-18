@@ -26,10 +26,10 @@ export function Card({
     <div
       className={`
         bg-white dark:bg-dark-card rounded-xl
-        border-2 border-gray-200 dark:border-dark-border
+        border border-gray-200 dark:border-white/10
         shadow-sm dark:shadow-none
         transition-all duration-300
-        ${hover ? 'hover:-translate-y-1 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 cursor-pointer' : ''}
+        ${hover ? 'hover:-translate-y-0.5 hover:shadow-md hover:border-gray-300 dark:hover:border-white/20 cursor-pointer' : ''}
         ${paddingStyles[padding]}
         ${className}
       `}

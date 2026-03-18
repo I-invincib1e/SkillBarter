@@ -42,10 +42,10 @@ export function Discover() {
   return (
     <div className="space-y-6 animate-fade-in">
       <div>
-        <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-1">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
           Discover Help
         </h1>
-        <p className="text-gray-500 dark:text-gray-400">
+        <p className="text-gray-500 dark:text-gray-400 text-sm">
           Find students who can help you with your needs
         </p>
       </div>
@@ -65,24 +65,24 @@ export function Discover() {
         <button
           onClick={() => setSelectedCategory(null)}
           className={`
-            px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all duration-200
+            px-3.5 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200
             ${!selectedCategory
-              ? 'bg-primary-600 text-white shadow-glow-blue'
-              : 'bg-white dark:bg-dark-card text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-dark-border hover:bg-gray-50 dark:hover:bg-dark-surface hover:border-gray-300'
+              ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
+              : 'bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/10'
             }
           `}
         >
-          All Categories
+          All
         </button>
         {categories.map((cat) => (
           <button
             key={cat.id}
             onClick={() => setSelectedCategory(cat.id)}
             className={`
-              px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all duration-200
+              px-3.5 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200
               ${selectedCategory === cat.id
-                ? 'bg-primary-600 text-white shadow-glow-blue'
-                : 'bg-white dark:bg-dark-card text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-dark-border hover:bg-gray-50 dark:hover:bg-dark-surface hover:border-gray-300'
+                ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
+                : 'bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/10'
               }
             `}
           >
@@ -105,13 +105,13 @@ export function Discover() {
         </div>
       ) : (
         <Card className="text-center py-16">
-          <div className="w-16 h-16 rounded-2xl bg-gray-100 dark:bg-dark-surface flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 rounded-2xl bg-gray-100 dark:bg-white/5 flex items-center justify-center mx-auto mb-4">
             <Search className="w-8 h-8 text-gray-300 dark:text-gray-600" />
           </div>
-          <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-2">
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
             No listings found
           </h3>
-          <p className="text-gray-400 mb-6 max-w-sm mx-auto">
+          <p className="text-gray-400 mb-6 max-w-sm mx-auto text-sm">
             {searchQuery ? 'Try adjusting your search terms' : 'Be the first to offer help in this category'}
           </p>
           <Link to="/listings/create">
@@ -139,16 +139,16 @@ function ListingCard({ listing }: { listing: ListingWithDetails }) {
             </div>
           </div>
         </div>
-        <Badge
-          size="sm"
+        <span
+          className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium"
           style={{ backgroundColor: listing.categories.color + '15', color: listing.categories.color }}
         >
           {listing.categories.name}
-        </Badge>
+        </span>
       </div>
 
       <Link to={`/listings/${listing.id}`} className="flex-1">
-        <h3 className="text-base font-bold text-gray-800 dark:text-white mb-1.5 line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+        <h3 className="text-base font-semibold text-gray-800 dark:text-white mb-1.5 line-clamp-2 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
           {listing.title}
         </h3>
         <p className="text-gray-400 text-sm line-clamp-2 mb-4 leading-relaxed">
@@ -156,11 +156,11 @@ function ListingCard({ listing }: { listing: ListingWithDetails }) {
         </p>
       </Link>
 
-      <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-dark-border">
-        <div className="flex items-center gap-4 text-sm text-gray-400">
+      <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-white/5">
+        <div className="flex items-center gap-3 text-sm text-gray-400">
           <div className="flex items-center gap-1">
-            <Zap className="w-4 h-4 text-warning-500" />
-            <span className="font-bold text-gray-800 dark:text-white">{listing.price_credits}</span>
+            <Zap className="w-3.5 h-3.5 text-cyan-500" />
+            <span className="font-semibold text-gray-800 dark:text-white">{listing.price_credits}</span>
           </div>
           <div className="flex items-center gap-1">
             <Clock className="w-3.5 h-3.5" />

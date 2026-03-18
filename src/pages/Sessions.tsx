@@ -71,10 +71,10 @@ export function Sessions() {
   return (
     <div className="space-y-6 animate-fade-in">
       <div>
-        <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-1">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
           My Sessions
         </h1>
-        <p className="text-gray-500 dark:text-gray-400">
+        <p className="text-gray-500 dark:text-gray-400 text-sm">
           Manage your help sessions
         </p>
       </div>
@@ -85,11 +85,11 @@ export function Sessions() {
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={`
-              px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all duration-200
+              px-3.5 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200
               ${
                 activeTab === tab.key
-                  ? 'bg-primary-600 text-white shadow-glow-blue'
-                  : 'bg-white dark:bg-dark-card text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-dark-border hover:bg-gray-50 dark:hover:bg-dark-surface hover:border-gray-300'
+                  ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
+                  : 'bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/10'
               }
             `}
           >
@@ -105,20 +105,20 @@ export function Sessions() {
           ))}
         </div>
       ) : sessions.length > 0 ? (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {sessions.map((session) => (
             <SessionCard key={session.id} session={session} userId={user!.id} />
           ))}
         </div>
       ) : (
         <Card className="text-center py-16">
-          <div className="w-16 h-16 rounded-2xl bg-gray-100 dark:bg-dark-surface flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 rounded-2xl bg-gray-100 dark:bg-white/5 flex items-center justify-center mx-auto mb-4">
             <Calendar className="w-8 h-8 text-gray-300 dark:text-gray-600" />
           </div>
-          <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-2">
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
             No {activeTab} sessions
           </h3>
-          <p className="text-gray-400 mb-6 max-w-sm mx-auto">
+          <p className="text-gray-400 mb-6 max-w-sm mx-auto text-sm">
             {activeTab === 'upcoming'
               ? 'Book a session to get started'
               : `You don't have any ${activeTab} sessions`}
@@ -147,11 +147,11 @@ function SessionCard({
   const isPast = scheduledDate < new Date();
 
   const statusConfig = {
-    pending: { color: 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400', icon: AlertCircle, label: 'Pending' },
-    accepted: { color: 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400', icon: Clock, label: 'Upcoming' },
-    in_progress: { color: 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400', icon: Clock, label: 'In Progress' },
-    completed: { color: 'bg-success-50 text-success-700 dark:bg-success-900/20 dark:text-success-400', icon: CheckCircle, label: 'Completed' },
-    cancelled: { color: 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400', icon: XCircle, label: 'Cancelled' },
+    pending: { color: 'bg-yellow-50 text-yellow-700 dark:bg-yellow-500/10 dark:text-yellow-400', icon: AlertCircle, label: 'Pending' },
+    accepted: { color: 'bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400', icon: Clock, label: 'Upcoming' },
+    in_progress: { color: 'bg-cyan-50 text-cyan-700 dark:bg-cyan-500/10 dark:text-cyan-400', icon: Clock, label: 'In Progress' },
+    completed: { color: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400', icon: CheckCircle, label: 'Completed' },
+    cancelled: { color: 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400', icon: XCircle, label: 'Cancelled' },
   };
 
   const status = statusConfig[session.status];
@@ -166,7 +166,7 @@ function SessionCard({
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-4 mb-2">
               <div>
-                <h3 className="font-bold text-gray-800 dark:text-white">
+                <h3 className="font-semibold text-gray-800 dark:text-white">
                   {session.listing?.title || session.request?.title || 'Session'}
                 </h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -184,7 +184,7 @@ function SessionCard({
 
             <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
               <div className="flex items-center gap-1.5">
-                <Calendar className="w-4 h-4" />
+                <Calendar className="w-3.5 h-3.5" />
                 <span>
                   {scheduledDate.toLocaleDateString(undefined, {
                     weekday: 'short',
@@ -194,7 +194,7 @@ function SessionCard({
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
-                <Clock className="w-4 h-4" />
+                <Clock className="w-3.5 h-3.5" />
                 <span>
                   {scheduledDate.toLocaleTimeString(undefined, {
                     hour: '2-digit',
@@ -203,8 +203,8 @@ function SessionCard({
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
-                <Zap className={`w-4 h-4 ${isProvider ? 'text-success-500' : 'text-warning-500'}`} />
-                <span className={`font-bold ${isProvider ? 'text-success-600' : 'text-gray-800 dark:text-white'}`}>
+                <Zap className={`w-3.5 h-3.5 ${isProvider ? 'text-emerald-500' : 'text-cyan-500'}`} />
+                <span className={`font-semibold ${isProvider ? 'text-emerald-600' : 'text-gray-800 dark:text-white'}`}>
                   {isProvider ? '+' : '-'}{session.credits_amount} credits
                 </span>
               </div>
@@ -213,15 +213,15 @@ function SessionCard({
             {session.status === 'accepted' && isPast && (
               <div className="mt-3 flex items-center gap-3">
                 <div className="flex items-center gap-1.5 text-xs">
-                  <span className={`w-2.5 h-2.5 rounded-full ${session.provider_confirmed ? 'bg-success-500' : 'bg-gray-300 dark:bg-gray-600'}`} />
+                  <span className={`w-2 h-2 rounded-full ${session.provider_confirmed ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-gray-600'}`} />
                   <span className="text-gray-500 dark:text-gray-400">Provider</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-xs">
-                  <span className={`w-2.5 h-2.5 rounded-full ${session.requester_confirmed ? 'bg-success-500' : 'bg-gray-300 dark:bg-gray-600'}`} />
+                  <span className={`w-2 h-2 rounded-full ${session.requester_confirmed ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-gray-600'}`} />
                   <span className="text-gray-500 dark:text-gray-400">Requester</span>
                 </div>
                 {!session.provider_confirmed || !session.requester_confirmed ? (
-                  <span className="text-xs text-primary-600 dark:text-primary-400 font-semibold ml-auto">
+                  <span className="text-xs text-cyan-600 dark:text-cyan-400 font-medium ml-auto">
                     Confirm completion
                   </span>
                 ) : null}
@@ -229,7 +229,7 @@ function SessionCard({
             )}
           </div>
 
-          <ArrowRight className="w-5 h-5 text-gray-300 dark:text-gray-600 shrink-0 group-hover:text-primary-500 transition-colors" />
+          <ArrowRight className="w-5 h-5 text-gray-300 dark:text-gray-600 shrink-0" />
         </div>
       </Card>
     </Link>
