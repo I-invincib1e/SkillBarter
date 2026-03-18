@@ -1,6 +1,20 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Calendar, MapPin, Star, Award, Flame, CheckCircle, CreditCard as Edit2 } from 'lucide-react';
+import {
+  Calendar,
+  MapPin,
+  Star,
+  Award,
+  Flame,
+  CheckCircle,
+  CreditCard as Edit2,
+  Github,
+  Linkedin,
+  Globe,
+  Video,
+  MessageCircle,
+  Zap,
+} from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import {
@@ -21,6 +35,12 @@ interface ReviewWithUser extends Review {
 interface BadgeWithDetails extends UserBadge {
   badges: BadgeType;
 }
+
+const COMM_LABELS: Record<string, { label: string; icon: typeof Zap }> = {
+  in_platform: { label: 'In-Platform', icon: Zap },
+  zoom: { label: 'Zoom', icon: Video },
+  discord: { label: 'Discord', icon: MessageCircle },
+};
 
 export function Profile() {
   const { id } = useParams<{ id: string }>();
@@ -96,54 +116,141 @@ export function Profile() {
   const reliabilityScore = profile.sessions_completed > 0 ?
     Math.min(100, (profile.sessions_completed / (profile.sessions_completed + 5)) * 100) : 0;
 
+  const hasPortfolio = profile.github_url || profile.linkedin_url || profile.website_url;
+  const commPref = COMM_LABELS[profile.preferred_communication] || COMM_LABELS.in_platform;
+
   return (
     <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
       <Card>
         <div className="flex flex-col md:flex-row gap-6">
           <div className="text-center md:text-left">
-            <Avatar
-              src={profile.avatar_url}
-              name={profile.name}
-              size="xl"
-              className="mx-auto md:mx-0"
-            />
+            <div className="relative inline-block">
+              <Avatar
+                src={profile.avatar_url}
+                name={profile.name}
+                size="xl"
+                className="mx-auto md:mx-0"
+              />
+              <div className={`absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full border-3 border-white dark:border-dark-card ${
+                profile.availability_status === 'active' ? 'bg-green-500' : 'bg-gray-400'
+              }`} />
+            </div>
           </div>
 
           <div className="flex-1 text-center md:text-left">
-            <div className="flex flex-col md:flex-row md:items-center gap-2 mb-2">
+            <div className="flex flex-col md:flex-row md:items-center gap-2 mb-1">
               <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">
                 {profile.name}
               </h1>
-              {isOwnProfile && (
-                <Link to="/settings">
-                  <Button variant="ghost" size="sm">
-                    <Edit2 className="w-4 h-4 mr-1" />
-                    Edit
-                  </Button>
-                </Link>
-              )}
+              <div className="flex items-center justify-center md:justify-start gap-2">
+                {profile.availability_status === 'active' ? (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                    Active
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400">
+                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400" />
+                    Busy
+                  </span>
+                )}
+                {isOwnProfile && (
+                  <Link to="/settings">
+                    <Button variant="ghost" size="sm">
+                      <Edit2 className="w-4 h-4 mr-1" />
+                      Edit
+                    </Button>
+                  </Link>
+                )}
+              </div>
             </div>
 
+            {profile.tagline && (
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-2 italic">
+                "{profile.tagline}"
+              </p>
+            )}
+
             {profile.university && (
-              <p className="text-gray-500 dark:text-gray-400 mb-3">
+              <p className="text-gray-500 dark:text-gray-400 text-sm mb-3">
                 <MapPin className="w-4 h-4 inline mr-1" />
                 {profile.university}
               </p>
             )}
 
             {profile.bio && (
-              <p className="text-gray-600 dark:text-gray-300 mb-4">
+              <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 leading-relaxed">
                 {profile.bio}
               </p>
             )}
 
-            <div className="flex flex-wrap justify-center md:justify-start gap-2 mb-4">
-              {profile.skills_offered.map((skill) => (
-                <Badge key={skill} variant="primary" size="sm">
-                  {skill}
-                </Badge>
-              ))}
-            </div>
+            {hasPortfolio && (
+              <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
+                {profile.github_url && (
+                  <a
+                    href={profile.github_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-dark-surface border border-gray-200 dark:border-dark-border flex items-center justify-center text-gray-500 hover:text-gray-900 dark:hover:text-white hover:border-gray-400 dark:hover:border-gray-500 transition-all"
+                  >
+                    <Github className="w-4 h-4" />
+                  </a>
+                )}
+                {profile.linkedin_url && (
+                  <a
+                    href={profile.linkedin_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-dark-surface border border-gray-200 dark:border-dark-border flex items-center justify-center text-gray-500 hover:text-gray-900 dark:hover:text-white hover:border-gray-400 dark:hover:border-gray-500 transition-all"
+                  >
+                    <Linkedin className="w-4 h-4" />
+                  </a>
+                )}
+                {profile.website_url && (
+                  <a
+                    href={profile.website_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-dark-surface border border-gray-200 dark:border-dark-border flex items-center justify-center text-gray-500 hover:text-gray-900 dark:hover:text-white hover:border-gray-400 dark:hover:border-gray-500 transition-all"
+                  >
+                    <Globe className="w-4 h-4" />
+                  </a>
+                )}
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-gray-100 dark:bg-dark-surface text-gray-500 dark:text-gray-400 ml-1">
+                  <commPref.icon className="w-3 h-3" />
+                  {commPref.label}
+                </span>
+              </div>
+            )}
+
+            {profile.skills_offered.length > 0 && (
+              <div className="mb-3">
+                <p className="font-mono text-[10px] uppercase tracking-widest text-gray-400 mb-1.5">Offering</p>
+                <div className="flex flex-wrap justify-center md:justify-start gap-2">
+                  {profile.skills_offered.map((skill) => (
+                    <Badge key={skill} variant="primary" size="sm">
+                      {skill}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {profile.skills_wanted && profile.skills_wanted.length > 0 && (
+              <div className="mb-4">
+                <p className="font-mono text-[10px] uppercase tracking-widest text-gray-400 mb-1.5">Seeking</p>
+                <div className="flex flex-wrap justify-center md:justify-start gap-2">
+                  {profile.skills_wanted.map((skill) => (
+                    <span
+                      key={skill}
+                      className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-warning-100 dark:bg-warning-900/30 text-warning-700 dark:text-warning-300"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="flex flex-wrap justify-center md:justify-start gap-6 text-sm">
               <div className="flex items-center gap-2">

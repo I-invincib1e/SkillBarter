@@ -1,46 +1,97 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, User, Save, X, Plus } from 'lucide-react';
+import {
+  ArrowLeft,
+  Save,
+  User,
+  Layers,
+  Clock,
+  Shield,
+  Receipt,
+  Eye,
+} from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../components/ui/Toast';
-import { Card, Button, Input, Textarea, Avatar } from '../components/ui';
+import { Button, Card } from '../components/ui';
+import { SettingsGeneral } from './settings/SettingsGeneral';
+import { SettingsSkills } from './settings/SettingsSkills';
+import { SettingsAvailability } from './settings/SettingsAvailability';
+import { SettingsSecurity } from './settings/SettingsSecurity';
+import { SettingsTransactions } from './settings/SettingsTransactions';
+import { SettingsPreview } from './settings/SettingsPreview';
+
+type SettingsTab = 'general' | 'profile' | 'skills' | 'availability' | 'security' | 'transactions';
+
+const TABS: { id: SettingsTab; label: string; code: string; icon: typeof User }[] = [
+  { id: 'general', label: 'General', code: 'GEN', icon: User },
+  { id: 'profile', label: 'Public Profile', code: 'PRF', icon: Eye },
+  { id: 'skills', label: 'Skills', code: 'SKL', icon: Layers },
+  { id: 'availability', label: 'Availability', code: 'AVL', icon: Clock },
+  { id: 'security', label: 'Security', code: 'SEC', icon: Shield },
+  { id: 'transactions', label: 'Transactions', code: 'TXN', icon: Receipt },
+];
 
 export function Settings() {
-  const { user, profile, refreshProfile } = useAuth();
+  const { user, profile, wallet, refreshProfile } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
-
-  const [name, setName] = useState(profile?.name || '');
-  const [bio, setBio] = useState(profile?.bio || '');
-  const [university, setUniversity] = useState(profile?.university || '');
-  const [skills, setSkills] = useState<string[]>(profile?.skills_offered || []);
-  const [newSkill, setNewSkill] = useState('');
+  const [activeTab, setActiveTab] = useState<SettingsTab>('general');
   const [saving, setSaving] = useState(false);
 
-  const addSkill = () => {
-    if (newSkill.trim() && !skills.includes(newSkill.trim())) {
-      setSkills([...skills, newSkill.trim()]);
-      setNewSkill('');
-    }
+  const [form, setForm] = useState({
+    name: profile?.name || '',
+    tagline: profile?.tagline || '',
+    bio: profile?.bio || '',
+    university: profile?.university || '',
+    github_url: profile?.github_url || '',
+    linkedin_url: profile?.linkedin_url || '',
+    website_url: profile?.website_url || '',
+    skills_offered: profile?.skills_offered || [] as string[],
+    skills_wanted: profile?.skills_wanted || [] as string[],
+    timezone: profile?.timezone || '',
+    preferred_communication: profile?.preferred_communication || ('in_platform' as const),
+    availability_status: profile?.availability_status || ('active' as const),
+  });
+
+  const updateField = (field: string, value: string | string[]) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const removeSkill = (skill: string) => {
-    setSkills(skills.filter((s) => s !== skill));
-  };
+  const hasChanges = profile && (
+    form.name !== profile.name ||
+    form.tagline !== (profile.tagline || '') ||
+    form.bio !== (profile.bio || '') ||
+    form.university !== (profile.university || '') ||
+    form.github_url !== (profile.github_url || '') ||
+    form.linkedin_url !== (profile.linkedin_url || '') ||
+    form.website_url !== (profile.website_url || '') ||
+    JSON.stringify(form.skills_offered) !== JSON.stringify(profile.skills_offered || []) ||
+    JSON.stringify(form.skills_wanted) !== JSON.stringify(profile.skills_wanted || []) ||
+    form.timezone !== (profile.timezone || '') ||
+    form.preferred_communication !== (profile.preferred_communication || 'in_platform') ||
+    form.availability_status !== (profile.availability_status || 'active')
+  );
 
   const handleSave = async () => {
     if (!user) return;
-
     setSaving(true);
 
     const { error } = await supabase
       .from('profiles')
       .update({
-        name,
-        bio,
-        university,
-        skills_offered: skills,
+        name: form.name,
+        tagline: form.tagline,
+        bio: form.bio,
+        university: form.university,
+        github_url: form.github_url,
+        linkedin_url: form.linkedin_url,
+        website_url: form.website_url,
+        skills_offered: form.skills_offered,
+        skills_wanted: form.skills_wanted,
+        timezone: form.timezone,
+        preferred_communication: form.preferred_communication,
+        availability_status: form.availability_status,
         updated_at: new Date().toISOString(),
       })
       .eq('id', user.id);
@@ -51,114 +102,215 @@ export function Settings() {
       await refreshProfile();
       showToast('Profile saved successfully!', 'success');
     }
-
     setSaving(false);
   };
 
-  if (!profile) return null;
+  const resetForm = () => {
+    if (!profile) return;
+    setForm({
+      name: profile.name || '',
+      tagline: profile.tagline || '',
+      bio: profile.bio || '',
+      university: profile.university || '',
+      github_url: profile.github_url || '',
+      linkedin_url: profile.linkedin_url || '',
+      website_url: profile.website_url || '',
+      skills_offered: profile.skills_offered || [],
+      skills_wanted: profile.skills_wanted || [],
+      timezone: profile.timezone || '',
+      preferred_communication: profile.preferred_communication || 'in_platform',
+      availability_status: profile.availability_status || 'active',
+    });
+  };
+
+  if (!profile || !user) return null;
+
+  const showSaveBar = activeTab !== 'security' && activeTab !== 'transactions';
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'general':
+        return (
+          <SettingsGeneral
+            profile={profile}
+            form={{
+              name: form.name,
+              tagline: form.tagline,
+              university: form.university,
+              bio: form.bio,
+              github_url: form.github_url,
+              linkedin_url: form.linkedin_url,
+              website_url: form.website_url,
+            }}
+            onChange={updateField}
+          />
+        );
+      case 'profile':
+        return (
+          <SettingsGeneral
+            profile={profile}
+            form={{
+              name: form.name,
+              tagline: form.tagline,
+              university: form.university,
+              bio: form.bio,
+              github_url: form.github_url,
+              linkedin_url: form.linkedin_url,
+              website_url: form.website_url,
+            }}
+            onChange={updateField}
+          />
+        );
+      case 'skills':
+        return (
+          <SettingsSkills
+            skillsOffered={form.skills_offered}
+            skillsWanted={form.skills_wanted}
+            onChangeOffered={(s) => updateField('skills_offered', s)}
+            onChangeWanted={(s) => updateField('skills_wanted', s)}
+          />
+        );
+      case 'availability':
+        return (
+          <SettingsAvailability
+            availabilityStatus={form.availability_status}
+            timezone={form.timezone}
+            preferredCommunication={form.preferred_communication}
+            onChange={updateField}
+          />
+        );
+      case 'security':
+        return <SettingsSecurity />;
+      case 'transactions':
+        return <SettingsTransactions userId={user.id} />;
+      default:
+        return null;
+    }
+  };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
-      <button
-        onClick={() => navigate(-1)}
-        className="flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white transition-colors font-medium"
-      >
-        <ArrowLeft className="w-5 h-5" />
-        Back
-      </button>
-
-      <div>
-        <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-1">
-          Settings
-        </h1>
-        <p className="text-gray-500 dark:text-gray-400">
-          Manage your profile and preferences
-        </p>
-      </div>
-
-      <Card>
-        <h2 className="font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
-          <User className="w-5 h-5" />
-          Profile Information
-        </h2>
-
-        <div className="flex items-center gap-4 mb-6">
-          <Avatar src={profile.avatar_url} name={profile.name} size="xl" />
+    <div className="animate-fade-in">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => navigate(-1)}
+            className="p-2 rounded-lg text-gray-400 hover:text-gray-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-dark-surface transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
           <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-              Profile photo is synced from your account
+            <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">
+              Settings
+            </h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Manage your profile and preferences
             </p>
           </div>
         </div>
 
-        <div className="space-y-4">
-          <Input
-            label="Full Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Your name"
-          />
+        {showSaveBar && hasChanges && (
+          <div className="hidden lg:block">
+            <Button onClick={handleSave} loading={saving} size="sm">
+              <Save className="w-4 h-4" />
+              Save Changes
+            </Button>
+          </div>
+        )}
+      </div>
 
-          <Textarea
-            label="Bio"
-            value={bio}
-            onChange={(e) => setBio(e.target.value)}
-            placeholder="Tell others about yourself..."
-            rows={3}
-          />
+      <div className="lg:hidden mb-4 -mx-1 overflow-x-auto">
+        <div className="flex gap-1.5 px-1 min-w-max">
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-3.5 py-2.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all duration-150 border-2 ${
+                activeTab === tab.id
+                  ? 'border-gray-900 dark:border-white/50 bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-[2px_2px_0px_0px_rgba(0,212,170,1)]'
+                  : 'border-gray-200 dark:border-dark-border text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-600'
+              }`}
+            >
+              <tab.icon className="w-3.5 h-3.5" />
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
-          <Input
-            label="University / School"
-            value={university}
-            onChange={(e) => setUniversity(e.target.value)}
-            placeholder="e.g., Stanford University"
-          />
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-              Skills
-            </label>
-            <div className="flex flex-wrap gap-2 mb-3">
-              {skills.map((skill) => (
-                <span
-                  key={skill}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 text-sm"
-                >
-                  {skill}
-                  <button
-                    type="button"
-                    onClick={() => removeSkill(skill)}
-                    className="p-0.5 hover:bg-primary-200 dark:hover:bg-primary-800/50 rounded-full transition-colors"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
+      <div className="flex gap-6">
+        <nav className="hidden lg:block w-56 flex-shrink-0">
+          <div className="sticky top-24 space-y-1">
+            {TABS.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-150 text-left border-2 ${
+                  activeTab === tab.id
+                    ? 'border-gray-900 dark:border-white/50 bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-[3px_3px_0px_0px_rgba(0,212,170,1)]'
+                    : 'border-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-dark-surface hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                <span className={`font-mono text-[10px] ${activeTab === tab.id ? 'text-cyan-300 dark:text-cyan-600' : 'text-gray-400'}`}>
+                  [{tab.code}]
                 </span>
-              ))}
+                <tab.icon className="w-4 h-4" />
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </nav>
+
+        <div className="flex-1 min-w-0">
+          <div className="grid grid-cols-1 xl:grid-cols-[1fr_280px] gap-6">
+            <Card>
+              {renderContent()}
+            </Card>
+            <div className="hidden xl:block">
+              <div className="sticky top-24">
+                <SettingsPreview
+                  profile={profile}
+                  wallet={wallet}
+                  form={{
+                    name: form.name,
+                    tagline: form.tagline,
+                    university: form.university,
+                    availability_status: form.availability_status,
+                    skills_offered: form.skills_offered,
+                    skills_wanted: form.skills_wanted,
+                    github_url: form.github_url,
+                    linkedin_url: form.linkedin_url,
+                    website_url: form.website_url,
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {showSaveBar && hasChanges && (
+        <div className="fixed bottom-0 left-0 right-0 lg:bottom-4 lg:left-auto lg:right-4 lg:w-auto z-40">
+          <div className="bg-white dark:bg-dark-card border-t-2 lg:border-2 border-gray-900 dark:border-white/30 lg:rounded-xl shadow-lg lg:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:lg:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.15)] p-4 flex items-center gap-4">
+            <div className="flex-1 lg:flex-none">
+              <p className="text-sm font-semibold text-gray-800 dark:text-white">
+                Unsaved changes
+              </p>
+              <p className="text-xs text-gray-400 hidden sm:block">
+                Save to apply your updates
+              </p>
             </div>
             <div className="flex gap-2">
-              <Input
-                placeholder="Add a skill..."
-                value={newSkill}
-                onChange={(e) => setNewSkill(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())}
-              />
-              <Button variant="secondary" onClick={addSkill} disabled={!newSkill.trim()}>
-                <Plus className="w-4 h-4" />
+              <Button variant="secondary" size="sm" onClick={resetForm}>
+                Discard
+              </Button>
+              <Button size="sm" onClick={handleSave} loading={saving}>
+                <Save className="w-4 h-4" />
+                Save
               </Button>
             </div>
           </div>
         </div>
-      </Card>
-
-      <div className="flex gap-4">
-        <Button variant="secondary" className="flex-1" onClick={() => navigate(-1)}>
-          Cancel
-        </Button>
-        <Button className="flex-1" onClick={handleSave} loading={saving}>
-          <Save className="w-4 h-4 mr-2" />
-          Save Changes
-        </Button>
-      </div>
+      )}
     </div>
   );
 }
