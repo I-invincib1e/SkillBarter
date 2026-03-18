@@ -45,7 +45,7 @@ export function Dashboard() {
       const [sessionsRes, transactionsRes, listingsRes, badgesRes] = await Promise.all([
         supabase
           .from('sessions')
-          .select(`*, provider:profiles!sessions_provider_id_fkey(name, avatar_url), requester:profiles!sessions_requester_id_fkey(name, avatar_url)`)
+          .select(`*, provider:profiles!sessions_provider_id_profiles_fkey(name, avatar_url), requester:profiles!sessions_requester_id_profiles_fkey(name, avatar_url)`)
           .or(`provider_id.eq.${user.id},requester_id.eq.${user.id}`)
           .in('status', ['pending', 'accepted'])
           .gte('scheduled_time', new Date().toISOString())

@@ -50,8 +50,8 @@ export function SessionDetail() {
         .from('sessions')
         .select(`
           *,
-          provider:profiles!sessions_provider_id_fkey(*),
-          requester:profiles!sessions_requester_id_fkey(*),
+          provider:profiles!sessions_provider_id_profiles_fkey(*),
+          requester:profiles!sessions_requester_id_profiles_fkey(*),
           listing:listings(*),
           request:requests(*)
         `)
