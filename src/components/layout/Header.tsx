@@ -1,14 +1,29 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Sun, Moon, Wallet, ChevronDown, LogOut, User, Settings, Menu, X, Zap } from 'lucide-react';
+import {
+  Sun,
+  Moon,
+  Wallet,
+  ChevronDown,
+  LogOut,
+  User,
+  Settings,
+  Menu,
+  X,
+  Zap,
+  Search,
+  Bell,
+  LayoutDashboard,
+} from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { Avatar, Button } from '../ui';
 
 const navLinks = [
-  { path: '/discover', label: 'Discover', icon: '01' },
-  { path: '/requests', label: 'Requests', icon: '02' },
-  { path: '/sessions', label: 'Sessions', icon: '03' },
+  { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { path: '/discover', label: 'Discover', icon: Search },
+  { path: '/requests', label: 'Requests', icon: Bell },
+  { path: '/sessions', label: 'Sessions', icon: Zap },
 ];
 
 export function Header() {
@@ -18,172 +33,197 @@ export function Header() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
+    const handleScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    setShowMobileMenu(false);
+    setShowUserMenu(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setShowUserMenu(false);
+      }
+    };
+    if (showUserMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showUserMenu]);
 
   return (
     <header
       className={`
         fixed top-0 left-0 right-0 z-50 transition-all duration-300
         ${scrolled
-          ? 'bg-white/95 dark:bg-dark-bg/95 backdrop-blur-xl shadow-lg border-b-2 border-gray-900 dark:border-cyan-400/50'
-          : 'bg-transparent'
+          ? 'bg-white/90 dark:bg-dark-bg/90 backdrop-blur-2xl shadow-[0_1px_3px_rgba(0,0,0,0.08)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3)] border-b border-gray-200/80 dark:border-white/10'
+          : 'bg-white/50 dark:bg-dark-bg/50 backdrop-blur-md border-b border-transparent'
         }
       `}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-16 md:h-20">
-          <div className="flex items-center gap-6 md:gap-10">
-            <Link to={user ? "/dashboard" : "/"} className="flex items-center gap-3 group">
+        <div className="flex items-center justify-between h-16">
+          <div className="flex items-center gap-8">
+            <Link to={user ? '/dashboard' : '/'} className="flex items-center gap-2.5 group">
               <div className="relative">
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-900 dark:bg-white flex items-center justify-center rounded-lg transition-all duration-200 group-hover:rotate-3 border-3 border-gray-900 dark:border-white shadow-[3px_3px_0px_0px_rgba(0,212,170,1)]">
-                  <Zap className="w-5 h-5 md:w-6 md:h-6 text-cyan-400 dark:text-gray-900" />
-                </div>
-                <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-cyan-400 rounded-full animate-pulse" />
-              </div>
-              <div className="hidden sm:block">
-                <span className="font-space font-bold text-xl md:text-2xl text-gray-900 dark:text-white tracking-tight">
-                  Skill<span className="text-cyan-500">Barter</span>
-                </span>
-                <div className="text-[10px] font-mono text-gray-400 dark:text-gray-500 tracking-widest uppercase">
-                  Learn & Earn
+                <div className="w-9 h-9 bg-gray-900 dark:bg-white flex items-center justify-center rounded-xl transition-all duration-200 group-hover:scale-105">
+                  <Zap className="w-4.5 h-4.5 text-cyan-400 dark:text-gray-900" />
                 </div>
               </div>
+              <span className="hidden sm:block font-space font-bold text-lg text-gray-900 dark:text-white tracking-tight">
+                Skill<span className="text-cyan-500">Barter</span>
+              </span>
             </Link>
 
             {user && (
-              <nav className="hidden md:flex items-center">
-                <div className="flex items-center bg-gray-100 dark:bg-dark-surface rounded-lg border-2 border-gray-900 dark:border-white/20 overflow-hidden">
-                  {navLinks.map((link, index) => {
-                    const isActive = location.pathname === link.path;
-                    return (
-                      <Link
-                        key={link.path}
-                        to={link.path}
-                        className={`
-                          relative px-5 py-2.5 font-space font-semibold text-sm transition-all duration-200
-                          ${index !== navLinks.length - 1 ? 'border-r-2 border-gray-900 dark:border-white/20' : ''}
-                          ${isActive
-                            ? 'bg-gray-900 dark:bg-cyan-500 text-white dark:text-gray-900'
-                            : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-dark-card'
-                          }
-                        `}
-                      >
-                        <span className="font-mono text-[10px] text-gray-400 dark:text-gray-500 mr-1.5">{link.icon}</span>
-                        {link.label}
-                      </Link>
-                    );
-                  })}
-                </div>
+              <nav className="hidden md:flex items-center gap-1">
+                {navLinks.map((link) => {
+                  const isActive = location.pathname === link.path;
+                  const Icon = link.icon;
+                  return (
+                    <Link
+                      key={link.path}
+                      to={link.path}
+                      className={`
+                        relative flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-200
+                        ${isActive
+                          ? 'text-gray-900 dark:text-white bg-gray-100 dark:bg-white/10'
+                          : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5'
+                        }
+                      `}
+                    >
+                      <Icon className="w-4 h-4" />
+                      {link.label}
+                      {isActive && (
+                        <span className="absolute bottom-0 left-3 right-3 h-0.5 bg-cyan-500 rounded-full" />
+                      )}
+                    </Link>
+                  );
+                })}
               </nav>
             )}
           </div>
 
-          <div className="flex items-center gap-2 md:gap-3">
+          <div className="flex items-center gap-2">
             <button
               onClick={toggleTheme}
-              className="p-2.5 md:p-3 bg-gray-100 dark:bg-dark-surface rounded-lg border-2 border-gray-900 dark:border-white/30 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-dark-card transition-all duration-200 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5"
+              className="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-all duration-200"
               aria-label="Toggle theme"
             >
-              {theme === 'light' ? <Moon className="w-4 h-4 md:w-5 md:h-5" /> : <Sun className="w-4 h-4 md:w-5 md:h-5" />}
+              {theme === 'light' ? <Moon className="w-[18px] h-[18px]" /> : <Sun className="w-[18px] h-[18px]" />}
             </button>
 
             {user ? (
               <>
                 <Link
                   to="/wallet"
-                  className="hidden sm:flex items-center gap-2 px-4 py-2.5 bg-cyan-400 dark:bg-cyan-500 text-gray-900 font-space font-bold text-sm rounded-lg border-2 border-gray-900 dark:border-gray-900 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-0.5 hover:translate-y-0.5 transition-all duration-150"
+                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-50 dark:bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 hover:bg-cyan-100 dark:hover:bg-cyan-500/20 transition-all duration-200 border border-cyan-200/60 dark:border-cyan-500/20"
                 >
-                  <Wallet className="w-4 h-4" />
-                  <span className="font-mono">{wallet?.balance ?? 0}</span>
-                  <span className="text-xs opacity-70">CR</span>
+                  <Wallet className="w-3.5 h-3.5" />
+                  <span className="font-mono text-sm font-semibold">{wallet?.balance ?? 0}</span>
+                  <span className="text-[10px] font-medium text-cyan-500 dark:text-cyan-500 uppercase">cr</span>
                 </Link>
 
-                <div className="relative">
+                <div className="relative" ref={menuRef}>
                   <button
                     onClick={() => setShowUserMenu(!showUserMenu)}
-                    className="flex items-center gap-2 p-1.5 rounded-lg border-2 border-gray-900 dark:border-white/30 bg-white dark:bg-dark-card hover:bg-gray-50 dark:hover:bg-dark-surface transition-all duration-200 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.2)]"
+                    className={`
+                      flex items-center gap-2 p-1 pr-2 rounded-lg transition-all duration-200
+                      ${showUserMenu
+                        ? 'bg-gray-100 dark:bg-white/10'
+                        : 'hover:bg-gray-100 dark:hover:bg-white/10'
+                      }
+                    `}
                   >
                     <Avatar src={profile?.avatar_url} name={profile?.name || 'User'} size="sm" />
-                    <ChevronDown className={`w-4 h-4 text-gray-400 hidden sm:block transition-transform duration-200 ${showUserMenu ? 'rotate-180' : ''}`} />
+                    <ChevronDown
+                      className={`w-3.5 h-3.5 text-gray-400 hidden sm:block transition-transform duration-200 ${
+                        showUserMenu ? 'rotate-180' : ''
+                      }`}
+                    />
                   </button>
 
                   {showUserMenu && (
-                    <>
-                      <div className="fixed inset-0" onClick={() => setShowUserMenu(false)} />
-                      <div className="absolute right-0 mt-3 w-64 bg-white dark:bg-dark-card rounded-xl border-3 border-gray-900 dark:border-white/50 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.2)] animate-scale-in overflow-hidden">
-                        <div className="px-4 py-4 border-b-2 border-gray-900 dark:border-white/20 bg-gray-50 dark:bg-dark-surface">
-                          <p className="font-space font-bold text-gray-900 dark:text-white">{profile?.name}</p>
-                          <p className="text-xs font-mono text-gray-500 truncate mt-1">{user.email}</p>
-                        </div>
-                        <div className="py-2">
-                          {[
-                            { to: '/profile', icon: User, label: 'Profile', code: 'USR' },
-                            { to: '/settings', icon: Settings, label: 'Settings', code: 'SET' },
-                          ].map((item) => (
-                            <Link
-                              key={item.to}
-                              to={item.to}
-                              onClick={() => setShowUserMenu(false)}
-                              className="flex items-center gap-3 px-4 py-3 text-sm font-space font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-dark-surface transition-colors border-l-4 border-transparent hover:border-cyan-400"
-                            >
-                              <span className="font-mono text-[10px] text-gray-400">[{item.code}]</span>
-                              <item.icon className="w-4 h-4" />
-                              {item.label}
-                            </Link>
-                          ))}
-                          <Link
-                            to="/wallet"
-                            onClick={() => setShowUserMenu(false)}
-                            className="flex sm:hidden items-center gap-3 px-4 py-3 text-sm font-space font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-dark-surface transition-colors border-l-4 border-transparent hover:border-cyan-400"
-                          >
-                            <span className="font-mono text-[10px] text-gray-400">[WAL]</span>
-                            <Wallet className="w-4 h-4" />
-                            <span>Wallet</span>
-                            <span className="ml-auto font-mono text-cyan-500">{wallet?.balance ?? 0} CR</span>
-                          </Link>
-                        </div>
-                        <div className="border-t-2 border-gray-900 dark:border-white/20 py-2">
-                          <button
-                            onClick={() => { setShowUserMenu(false); signOut(); }}
-                            className="flex items-center gap-3 w-full px-4 py-3 text-sm font-space font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors border-l-4 border-transparent hover:border-red-500"
-                          >
-                            <span className="font-mono text-[10px] text-red-400">[END]</span>
-                            <LogOut className="w-4 h-4" />
-                            Sign Out
-                          </button>
+                    <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-white/10 shadow-xl dark:shadow-2xl animate-scale-in overflow-hidden">
+                      <div className="px-4 py-3 border-b border-gray-100 dark:border-white/10">
+                        <div className="flex items-center gap-3">
+                          <Avatar src={profile?.avatar_url} name={profile?.name || 'User'} size="md" />
+                          <div className="min-w-0">
+                            <p className="font-semibold text-gray-900 dark:text-white text-sm truncate">
+                              {profile?.name}
+                            </p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
+                          </div>
                         </div>
                       </div>
-                    </>
+
+                      <div className="p-1.5">
+                        {[
+                          { to: '/profile', icon: User, label: 'Your Profile' },
+                          { to: '/settings', icon: Settings, label: 'Settings' },
+                        ].map((item) => (
+                          <Link
+                            key={item.to}
+                            to={item.to}
+                            onClick={() => setShowUserMenu(false)}
+                            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
+                          >
+                            <item.icon className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                            {item.label}
+                          </Link>
+                        ))}
+                        <Link
+                          to="/wallet"
+                          onClick={() => setShowUserMenu(false)}
+                          className="flex sm:hidden items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
+                        >
+                          <Wallet className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                          <span>Wallet</span>
+                          <span className="ml-auto font-mono text-sm font-semibold text-cyan-600 dark:text-cyan-400">
+                            {wallet?.balance ?? 0} CR
+                          </span>
+                        </Link>
+                      </div>
+
+                      <div className="border-t border-gray-100 dark:border-white/10 p-1.5">
+                        <button
+                          onClick={() => {
+                            setShowUserMenu(false);
+                            signOut();
+                          }}
+                          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          Sign Out
+                        </button>
+                      </div>
+                    </div>
                   )}
                 </div>
 
                 <button
                   onClick={() => setShowMobileMenu(!showMobileMenu)}
-                  className="md:hidden p-2.5 bg-gray-100 dark:bg-dark-surface rounded-lg border-2 border-gray-900 dark:border-white/30 text-gray-700 dark:text-gray-200 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.2)]"
+                  className="md:hidden p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
                 >
                   {showMobileMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                 </button>
               </>
             ) : (
-              <div className="flex items-center gap-2 md:gap-3">
+              <div className="flex items-center gap-2">
                 <Link to="/login">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="font-space font-semibold border-2 border-transparent hover:border-gray-900 dark:hover:border-white/30"
-                  >
+                  <Button variant="ghost" size="sm">
                     Sign In
                   </Button>
                 </Link>
                 <Link to="/signup">
-                  <button className="px-4 md:px-6 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-space font-bold text-sm rounded-lg border-2 border-gray-900 dark:border-white shadow-[3px_3px_0px_0px_rgba(0,212,170,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,212,170,1)] hover:translate-x-0.5 hover:translate-y-0.5 transition-all duration-150">
+                  <button className="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-semibold text-sm rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors">
                     Get Started
                   </button>
                 </Link>
@@ -193,25 +233,28 @@ export function Header() {
         </div>
 
         {showMobileMenu && user && (
-          <nav className="md:hidden py-4 border-t-2 border-gray-900 dark:border-white/20 animate-slide-down bg-white dark:bg-dark-bg">
+          <nav className="md:hidden pb-4 pt-2 border-t border-gray-100 dark:border-white/10 animate-slide-down">
             <div className="space-y-1">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  onClick={() => setShowMobileMenu(false)}
-                  className={`
-                    flex items-center gap-3 px-4 py-3 font-space font-semibold text-sm transition-all duration-200 border-l-4
-                    ${location.pathname === link.path
-                      ? 'border-cyan-400 bg-gray-100 dark:bg-dark-surface text-gray-900 dark:text-white'
-                      : 'border-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-dark-surface hover:border-gray-300'
-                    }
-                  `}
-                >
-                  <span className="font-mono text-[10px] text-gray-400">{link.icon}</span>
-                  {link.label}
-                </Link>
-              ))}
+              {navLinks.map((link) => {
+                const Icon = link.icon;
+                const isActive = location.pathname === link.path;
+                return (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className={`
+                      flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
+                      ${isActive
+                        ? 'text-gray-900 dark:text-white bg-gray-100 dark:bg-white/10'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5'
+                      }
+                    `}
+                  >
+                    <Icon className="w-4 h-4" />
+                    {link.label}
+                  </Link>
+                );
+              })}
             </div>
           </nav>
         )}
