@@ -209,7 +209,7 @@ export function Settings() {
         </div>
 
         {showSaveBar && hasChanges && (
-          <div className="hidden lg:block">
+          <div className="hidden md:block">
             <Button onClick={handleSave} loading={saving} size="sm">
               <Save className="w-4 h-4" />
               Save Changes
@@ -218,7 +218,7 @@ export function Settings() {
         )}
       </div>
 
-      <div className="lg:hidden mb-4 -mx-1 overflow-x-auto">
+      <div className="md:hidden mb-4 -mx-1 overflow-x-auto">
         <div className="flex gap-1.5 px-1 min-w-max">
           {TABS.map((tab) => (
             <button
@@ -238,7 +238,7 @@ export function Settings() {
       </div>
 
       <div className="flex gap-6">
-        <nav className="hidden lg:block w-56 flex-shrink-0">
+        <nav className="hidden md:block w-56 flex-shrink-0">
           <div className="sticky top-24 space-y-1">
             {TABS.map((tab) => (
               <button
@@ -289,8 +289,8 @@ export function Settings() {
       </div>
 
       {showSaveBar && hasChanges && (
-        <div className="fixed bottom-0 left-0 right-0 lg:bottom-4 lg:left-auto lg:right-4 lg:w-auto z-40">
-          <div className="bg-white dark:bg-dark-card border-t-2 lg:border-2 border-gray-900 dark:border-white/30 lg:rounded-xl shadow-lg lg:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:lg:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.15)] p-4 flex items-center gap-4">
+        <div className="fixed bottom-0 left-0 right-0 md:bottom-4 md:left-auto md:right-4 md:w-auto z-40">
+          <div className="bg-white dark:bg-dark-card border-t-2 md:border-2 border-gray-900 dark:border-white/30 md:rounded-xl shadow-lg md:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:md:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.15)] p-4 flex items-center gap-4">
             <div className="flex-1 lg:flex-none">
               <p className="text-sm font-semibold text-gray-800 dark:text-white">
                 Unsaved changes
