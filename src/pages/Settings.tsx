@@ -9,6 +9,7 @@ import {
   Shield,
   Receipt,
   Eye,
+  Palette,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -20,14 +21,16 @@ import { SettingsAvailability } from './settings/SettingsAvailability';
 import { SettingsSecurity } from './settings/SettingsSecurity';
 import { SettingsTransactions } from './settings/SettingsTransactions';
 import { SettingsPreview } from './settings/SettingsPreview';
+import { SettingsAppearance } from './settings/SettingsAppearance';
 
-type SettingsTab = 'general' | 'profile' | 'skills' | 'availability' | 'security' | 'transactions';
+type SettingsTab = 'general' | 'profile' | 'skills' | 'availability' | 'appearance' | 'security' | 'transactions';
 
 const TABS: { id: SettingsTab; label: string; icon: typeof User }[] = [
   { id: 'general', label: 'General', icon: User },
   { id: 'profile', label: 'Public Profile', icon: Eye },
   { id: 'skills', label: 'Skills', icon: Layers },
   { id: 'availability', label: 'Availability', icon: Clock },
+  { id: 'appearance', label: 'Appearance', icon: Palette },
   { id: 'security', label: 'Security', icon: Shield },
   { id: 'transactions', label: 'Transactions', icon: Receipt },
 ];
@@ -125,7 +128,7 @@ export function Settings() {
 
   if (!profile || !user) return null;
 
-  const showSaveBar = activeTab !== 'security' && activeTab !== 'transactions';
+  const showSaveBar = activeTab !== 'security' && activeTab !== 'transactions' && activeTab !== 'appearance';
 
   const renderContent = () => {
     switch (activeTab) {
@@ -179,6 +182,8 @@ export function Settings() {
             onChange={updateField}
           />
         );
+      case 'appearance':
+        return <SettingsAppearance />;
       case 'security':
         return <SettingsSecurity />;
       case 'transactions':

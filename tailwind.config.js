@@ -54,10 +54,10 @@ export default {
           900: '#78350F',
         },
         dark: {
-          bg: '#0C0F1A',
-          card: '#151928',
-          border: '#232842',
-          surface: '#1A1F35',
+          bg: '#09090B',
+          card: '#111113',
+          border: '#1E1E21',
+          surface: '#151517',
         },
       },
       fontFamily: {

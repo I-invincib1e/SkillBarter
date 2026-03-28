@@ -1,13 +1,25 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 
 type Theme = 'light' | 'dark';
+type ThemePreference = 'auto' | 'light' | 'dark';
 
 interface ThemeContextType {
   theme: Theme;
+  preference: ThemePreference;
+  setPreference: (pref: ThemePreference) => void;
   toggleTheme: () => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | null>(null);
+
+function getSystemTheme(): Theme {
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+function resolveTheme(pref: ThemePreference): Theme {
+  if (pref === 'auto') return getSystemTheme();
+  return pref;
+}
 
 export function useTheme() {
   const context = useContext(ThemeContext);
@@ -18,11 +30,30 @@ export function useTheme() {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(() => {
-    const stored = localStorage.getItem('theme') as Theme;
-    if (stored) return stored;
-    return 'light';
+  const [preference, setPreferenceState] = useState<ThemePreference>(() => {
+    const stored = localStorage.getItem('theme-preference') as ThemePreference;
+    if (stored === 'light' || stored === 'dark' || stored === 'auto') return stored;
+    return 'auto';
   });
+
+  const [theme, setTheme] = useState<Theme>(() => resolveTheme(
+    (() => {
+      const stored = localStorage.getItem('theme-preference') as ThemePreference;
+      if (stored === 'light' || stored === 'dark' || stored === 'auto') return stored;
+      return 'auto';
+    })()
+  ));
+
+  useEffect(() => {
+    if (preference !== 'auto') return;
+
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    const handler = (e: MediaQueryListEvent) => {
+      setTheme(e.matches ? 'dark' : 'light');
+    };
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, [preference]);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -31,15 +62,21 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     } else {
       root.classList.remove('dark');
     }
-    localStorage.setItem('theme', theme);
   }, [theme]);
 
+  const setPreference = (pref: ThemePreference) => {
+    setPreferenceState(pref);
+    localStorage.setItem('theme-preference', pref);
+    setTheme(resolveTheme(pref));
+  };
+
   const toggleTheme = () => {
-    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+    const next = theme === 'light' ? 'dark' : 'light';
+    setPreference(next);
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, preference, setPreference, toggleTheme }}>
       {children}
     </ThemeContext.Provider>
   );
