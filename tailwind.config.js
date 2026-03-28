@@ -62,6 +62,8 @@ export default {
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+        space: ['Space Grotesk', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
         'soft': '0 2px 16px rgba(0, 0, 0, 0.06)',
