@@ -74,7 +74,7 @@ export function Wallet() {
         </p>
       </div>
 
-      <Card className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 dark:from-gray-900 dark:via-gray-800/90 dark:to-gray-900 text-white overflow-hidden relative border-0 dark:border-white/5">
+      <Card className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 dark:from-dark-bg dark:via-dark-card dark:to-dark-bg text-white overflow-hidden relative border-0 dark:border-white/5">
         <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-500/10 rounded-full translate-y-1/2 -translate-x-1/2 blur-2xl" />
 

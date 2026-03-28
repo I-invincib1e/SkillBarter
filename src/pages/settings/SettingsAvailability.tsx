@@ -60,7 +60,7 @@ export function SettingsAvailability({
             className={`relative w-12 h-7 rounded-full transition-colors duration-200 ${
               availabilityStatus === 'active'
                 ? 'bg-green-500'
-                : 'bg-gray-300 dark:bg-gray-600'
+                : 'bg-gray-300 dark:bg-white/30'
             }`}
           >
             <div className={`absolute top-1 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-200 ${
@@ -113,7 +113,7 @@ export function SettingsAvailability({
                   className={`p-4 rounded-lg border-2 text-left transition-all duration-200 ${
                     preferredCommunication === opt.value
                       ? 'border-gray-900 dark:border-white/50 bg-white dark:bg-dark-card shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.15)]'
-                      : 'border-gray-200 dark:border-dark-border bg-gray-50 dark:bg-dark-surface hover:border-gray-300 dark:hover:border-gray-600'
+                      : 'border-gray-200 dark:border-dark-border bg-gray-50 dark:bg-dark-surface hover:border-gray-300 dark:hover:border-white/20'
                   }`}
                 >
                   <opt.icon className={`w-5 h-5 mb-2 ${

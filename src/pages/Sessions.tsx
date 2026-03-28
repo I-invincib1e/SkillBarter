@@ -113,7 +113,7 @@ export function Sessions() {
       ) : (
         <Card className="text-center py-16">
           <div className="w-16 h-16 rounded-2xl bg-gray-100 dark:bg-white/5 flex items-center justify-center mx-auto mb-4">
-            <Calendar className="w-8 h-8 text-gray-300 dark:text-gray-600" />
+            <Calendar className="w-8 h-8 text-gray-300 dark:text-gray-500" />
           </div>
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
             No {activeTab} sessions
@@ -213,11 +213,11 @@ function SessionCard({
             {session.status === 'accepted' && isPast && (
               <div className="mt-3 flex items-center gap-3">
                 <div className="flex items-center gap-1.5 text-xs">
-                  <span className={`w-2 h-2 rounded-full ${session.provider_confirmed ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-gray-600'}`} />
+                  <span className={`w-2 h-2 rounded-full ${session.provider_confirmed ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-white/30'}`} />
                   <span className="text-gray-500 dark:text-gray-400">Provider</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-xs">
-                  <span className={`w-2 h-2 rounded-full ${session.requester_confirmed ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-gray-600'}`} />
+                  <span className={`w-2 h-2 rounded-full ${session.requester_confirmed ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-white/30'}`} />
                   <span className="text-gray-500 dark:text-gray-400">Requester</span>
                 </div>
                 {!session.provider_confirmed || !session.requester_confirmed ? (
@@ -229,7 +229,7 @@ function SessionCard({
             )}
           </div>
 
-          <ArrowRight className="w-5 h-5 text-gray-300 dark:text-gray-600 shrink-0" />
+          <ArrowRight className="w-5 h-5 text-gray-300 dark:text-gray-500 shrink-0" />
         </div>
       </Card>
     </Link>

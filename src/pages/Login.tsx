@@ -115,7 +115,7 @@ export function Login() {
               type="button"
               onClick={handleGoogleSignIn}
               disabled={googleLoading}
-              className="w-full flex items-center justify-center gap-3 px-5 py-3.5 rounded-lg border-2 border-gray-200 dark:border-dark-border bg-white dark:bg-dark-surface text-gray-700 dark:text-gray-200 font-space font-semibold hover:bg-gray-50 dark:hover:bg-dark-card transition-all duration-200 hover:border-gray-300 dark:hover:border-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-3 px-5 py-3.5 rounded-lg border-2 border-gray-200 dark:border-dark-border bg-white dark:bg-dark-surface text-gray-700 dark:text-gray-200 font-space font-semibold hover:bg-gray-50 dark:hover:bg-dark-card transition-all duration-200 hover:border-gray-300 dark:hover:border-white/25 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {googleLoading ? (
                 <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />

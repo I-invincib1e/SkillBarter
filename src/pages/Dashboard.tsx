@@ -101,7 +101,7 @@ export function Dashboard() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Link to="/wallet" className="lg:col-span-2">
-          <Card hover className="h-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 dark:from-gray-900 dark:via-gray-800/90 dark:to-gray-900 text-white border-0 dark:border-white/5 overflow-hidden relative group">
+          <Card hover className="h-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 dark:from-dark-bg dark:via-dark-card dark:to-dark-bg text-white border-0 dark:border-white/5 overflow-hidden relative group">
             <div className="absolute top-0 right-0 w-40 h-40 bg-cyan-500/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
             <div className="absolute bottom-0 left-0 w-32 h-32 bg-emerald-500/10 rounded-full translate-y-1/2 -translate-x-1/2 blur-2xl" />
 
@@ -186,7 +186,7 @@ export function Dashboard() {
           ) : (
             <div className="h-full flex flex-col items-center justify-center text-center py-4">
               <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-white/5 flex items-center justify-center mb-3">
-                <Calendar className="w-6 h-6 text-gray-300 dark:text-gray-600" />
+                <Calendar className="w-6 h-6 text-gray-300 dark:text-gray-500" />
               </div>
               <p className="text-gray-600 dark:text-gray-300 text-sm font-medium mb-1">No upcoming sessions</p>
               <p className="text-gray-400 text-xs mb-3">Book a session to get started</p>

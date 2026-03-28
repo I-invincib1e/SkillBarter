@@ -51,7 +51,7 @@ export function StarRating({
             <Star
               className={`
                 ${sizes[size]}
-                ${filled || partial ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300 dark:text-gray-600'}
+                ${filled || partial ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300 dark:text-gray-500'}
                 transition-colors
               `}
             />

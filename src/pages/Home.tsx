@@ -256,7 +256,7 @@ export function Home() {
               </span>{' '}
               Cash.
               <br />
-              <span className="text-gray-400 dark:text-gray-600">All Growth.</span>
+              <span className="text-gray-400 dark:text-gray-500">All Growth.</span>
             </h1>
 
             <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-10 font-mono leading-relaxed">

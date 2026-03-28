@@ -126,7 +126,7 @@ function BadgeCard({ badge, progress }: { badge: BadgeWithEarned; progress: numb
 
       {!badge.earned && (
         <div className="space-y-1">
-          <div className="h-2 rounded-full bg-gray-200 dark:bg-slate-700 overflow-hidden">
+          <div className="h-2 rounded-full bg-gray-200 dark:bg-dark-surface overflow-hidden">
             <div
               className="h-full rounded-full transition-all duration-500"
               style={{
