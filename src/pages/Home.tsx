@@ -10,14 +10,10 @@ import {
   Shield,
   Star,
   ChevronDown,
-  Sun,
-  Moon,
   MessageSquare,
   Layers,
-  Check,
   Sparkles,
 } from 'lucide-react';
-import { useTheme } from '../contexts/ThemeContext';
 import { useInView } from '../hooks/useInView';
 import { useCountUp } from '../hooks/useCountUp';
 
@@ -48,7 +44,6 @@ function AnimatedCounter({ target, suffix = '', label }: { target: number; suffi
 }
 
 export function Home() {
-  const { theme, toggleTheme } = useTheme();
   const [activeFeature, setActiveFeature] = useState(0);
 
   useEffect(() => {
@@ -229,28 +224,7 @@ export function Home() {
               </div>
             </Link>
 
-            <div className="hidden md:flex items-center">
-              <div className="flex items-center bg-gray-50 dark:bg-dark-surface border-2 border-gray-900 dark:border-white/20">
-                {['Features', 'How it Works', 'Testimonials'].map((item, i) => (
-                  <a
-                    key={item}
-                    href={`#${item.toLowerCase().replace(' ', '-')}`}
-                    className={`px-4 py-2 font-mono font-medium text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-dark-card hover:text-gray-900 dark:hover:text-white transition-all ${i !== 2 ? 'border-r-2 border-gray-900 dark:border-white/20' : ''}`}
-                  >
-                    {item}
-                  </a>
-                ))}
-              </div>
-            </div>
-
             <div className="flex items-center gap-2 md:gap-3">
-              <button
-                onClick={toggleTheme}
-                className="p-2.5 bg-gray-50 dark:bg-dark-surface border-2 border-gray-900 dark:border-white/30 text-gray-700 dark:text-gray-200 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all"
-                aria-label="Toggle theme"
-              >
-                {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
-              </button>
               <Link to="/login" className="hidden sm:block">
                 <button className="px-4 py-2 font-mono font-semibold text-xs text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white transition-colors">
                   Sign In
@@ -273,11 +247,6 @@ export function Home() {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-500/10 border-2 border-gray-900 dark:border-white/30 text-gray-900 dark:text-blue-400 font-mono text-xs mb-8">
-              <span className="w-2 h-2 bg-blue-600 dark:bg-blue-400 rounded-full animate-pulse" />
-              <span>V2.0 LIVE // 10,000+ STUDENTS</span>
-            </div>
-
             <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-mono font-bold text-gray-900 dark:text-white leading-[0.95] tracking-tight mb-8">
               Trade Skills.
               <br />
@@ -287,7 +256,7 @@ export function Home() {
               </span>{' '}
               Cash.
               <br />
-              <span className="text-gray-300 dark:text-gray-600">All Growth.</span>
+              <span className="text-gray-400 dark:text-gray-600">All Growth.</span>
             </h1>
 
             <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-10 font-mono leading-relaxed">
@@ -306,20 +275,6 @@ export function Home() {
               </a>
             </div>
 
-            <div className="flex items-center justify-center gap-6 text-sm text-gray-500 dark:text-gray-400 font-mono">
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                <span>Free to join</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                <span>No credit card</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                <span>10 free credits</span>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -562,20 +517,20 @@ export function Home() {
         </div>
       </section>
 
-      <footer className="bg-gray-900 dark:bg-black text-gray-300 py-16 border-t-4 border-gray-900 dark:border-blue-500/30">
+      <footer className="bg-blue-500 dark:bg-blue-600 text-white py-16 border-t-4 border-blue-600 dark:border-blue-400">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid md:grid-cols-5 gap-8 mb-12">
             <div className="md:col-span-2">
               <Link to="/" className="flex items-center gap-2 mb-4 group">
                 <div className="w-10 h-10 bg-white flex items-center justify-center border-2 border-white">
-                  <Zap className="w-5 h-5 text-gray-900" />
+                  <Zap className="w-5 h-5 text-blue-600" />
                 </div>
                 <div>
                   <span className="font-mono font-bold text-xl text-white">SkillBarter</span>
-                  <div className="text-[9px] font-mono text-gray-500 tracking-[0.2em]">LEARN // EARN // GROW</div>
+                  <div className="text-[9px] font-mono text-blue-200 tracking-[0.2em]">LEARN // EARN // GROW</div>
                 </div>
               </Link>
-              <p className="text-sm font-mono leading-relaxed text-gray-400 mb-4 max-w-xs">
+              <p className="text-sm font-mono leading-relaxed text-blue-100 mb-4 max-w-xs">
                 The peer-to-peer learning platform built for students who want to learn and teach without barriers.
               </p>
               <div className="flex gap-3">
@@ -583,7 +538,7 @@ export function Home() {
                   <a
                     key={social}
                     href="#"
-                    className="w-8 h-8 bg-gray-800 border border-gray-700 flex items-center justify-center font-mono text-xs text-gray-400 hover:text-white hover:border-blue-500 transition-colors"
+                    className="w-8 h-8 bg-blue-600 border border-blue-400 flex items-center justify-center font-mono text-xs text-blue-200 hover:text-white hover:bg-blue-700 hover:border-white transition-colors"
                   >
                     {social}
                   </a>
@@ -623,13 +578,13 @@ export function Home() {
                   {section.links.map((link) =>
                     'to' in link && link.to ? (
                       <li key={link.label}>
-                        <Link to={link.to} className="text-gray-400 hover:text-blue-400 transition-colors">
+                        <Link to={link.to} className="text-blue-100 hover:text-white transition-colors">
                           {link.label}
                         </Link>
                       </li>
                     ) : (
                       <li key={link.label}>
-                        <a href={'href' in link ? link.href : '#'} className="text-gray-400 hover:text-blue-400 transition-colors">
+                        <a href={'href' in link ? link.href : '#'} className="text-blue-100 hover:text-white transition-colors">
                           {link.label}
                         </a>
                       </li>
@@ -640,13 +595,13 @@ export function Home() {
             ))}
           </div>
 
-          <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm font-mono text-gray-500">
+          <div className="border-t border-blue-400/40 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-sm font-mono text-blue-200">
               &copy; 2024 SkillBarter // ALL_RIGHTS_RESERVED
             </p>
-            <div className="flex items-center gap-4 text-xs font-mono text-gray-600">
-              <span>SYSTEM_STATUS: <span className="text-emerald-400">ONLINE</span></span>
-              <span>VERSION: <span className="text-blue-400">2.0.0</span></span>
+            <div className="flex items-center gap-4 text-xs font-mono text-blue-200">
+              <span>SYSTEM_STATUS: <span className="text-white">ONLINE</span></span>
+              <span>VERSION: <span className="text-white">2.0.0</span></span>
             </div>
           </div>
         </div>
