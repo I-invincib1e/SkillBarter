@@ -1,4 +1,4 @@
-# SkillBarter
+# SkillBarter v1.p0
 
 A peer-to-peer skill exchange platform for students to trade expertise using a credit-based system.
 

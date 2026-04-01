@@ -351,7 +351,7 @@ ALTER TABLE user_badges ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "User badges are viewable by everyone"
   ON user_badges FOR SELECT
-  USING (true);
+  USING (t       );
 
 CREATE POLICY "System can insert user badges"
   ON user_badges FOR INSERT
@@ -426,6 +426,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 DROP TRIGGER IF EXISTS on_review_created ON reviews;
 CREATE TRIGGER on_review_created
   AFTER INSERT ON reviews
+           
   FOR EACH ROW EXECUTE FUNCTION update_user_rating();
 
 -- Indexes for performance
@@ -438,4 +439,4 @@ CREATE INDEX IF NOT EXISTS idx_sessions_provider_id ON sessions(provider_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_requester_id ON sessions(requester_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_status ON sessions(status);
 CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON transactions(user_id);
-CREATE INDEX IF NOT EXISTS idx_reviews_reviewed_user_id ON reviews(reviewed_user_id);
+CREATE INDEX IF NOT EXISTS idx_reviews_reviewed_user_id ON reviews(reviewed_user_id
