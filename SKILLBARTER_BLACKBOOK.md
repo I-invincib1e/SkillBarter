@@ -7,6 +7,14 @@
 3. [Team Roles & Responsibilities](#team-roles--responsibilities)
 4. [System Architecture](#system-architecture)
 5. [Database Design & ER Diagrams](#database-design--er-diagrams)
+   - [Normalization Analysis](#database-normalization-analysis)
+   - [ACID Properties & Transaction Handling](#acid-properties--transaction-handling)
+   - [Indexing Strategy](#indexing-strategy)
+   - [Referential Integrity & Constraints](#referential-integrity--constraints)
+   - [Denormalization Decisions](#denormalization-decisions)
+   - [Database Triggers & Functions](#database-triggers--functions)
+   - [Entity Relationship Cardinalities](#entity-relationship-cardinalities)
+   - [Data Dictionary](#data-dictionary)
 6. [Data Flow & Workflows](#data-flow--workflows)
 7. [Feature Specifications](#feature-specifications)
 8. [Technology Stack](#technology-stack)
@@ -768,6 +776,339 @@ Security:
 | Streak Calculation | Automatic streak tracking | PostgreSQL trigger |
 | Rating Aggregation | Auto-update ratings | PostgreSQL trigger |
 | RLS Policies | Data access control | 20+ RLS policies across tables |
+
+### Database Normalization Analysis
+
+Database normalization is the process of organizing a relational database to reduce data redundancy and improve data integrity. The SkillBarter schema follows normalization principles up to **Third Normal Form (3NF)** with intentional denormalization where performance demands it.
+
+#### First Normal Form (1NF)
+
+A table is in 1NF when:
+- All columns contain atomic (indivisible) values
+- Each row is uniquely identifiable by a primary key
+- No repeating groups exist
+
+**SkillBarter Compliance:**
+
+| Table | 1NF Status | Notes |
+|-------|-----------|-------|
+| profiles | Partial | `skills_offered` is a PostgreSQL `TEXT[]` array. While arrays violate strict 1NF (non-atomic), PostgreSQL natively supports array types with indexing and querying. A separate `user_skills` junction table would be the fully normalized alternative. |
+| wallets | Compliant | All columns are atomic; one row per user enforced by `UNIQUE(user_id)`. |
+| listings | Compliant | All columns are scalar values. `location_type` stores a single enum-like string, not multiple values. |
+| sessions | Compliant | All columns are atomic. Status is a single string value at any point in time. |
+| categories | Compliant | All columns are atomic and each row is uniquely identified. |
+| transactions | Compliant | All columns contain single values. Transaction type is a single enum string. |
+
+**Design Decision - `skills_offered` Array:**
+The `skills_offered TEXT[]` column in the `profiles` table is a deliberate trade-off. A fully normalized design would require:
+```
+profiles (id, name, email, ...)
+skills (id, name)
+user_skills (user_id FK, skill_id FK)
+```
+The array approach was chosen because:
+- Skills are free-text tags, not from a controlled vocabulary
+- No queries join on individual skills
+- Simpler writes (single UPDATE vs. DELETE + re-INSERT on junction table)
+- PostgreSQL GIN indexes support efficient array containment queries (`@>` operator)
+
+#### Second Normal Form (2NF)
+
+A table is in 2NF when:
+- It satisfies 1NF
+- Every non-key column depends on the **entire** primary key (no partial dependencies)
+
+Since all SkillBarter tables use single-column surrogate primary keys (`id UUID`), partial dependencies are structurally impossible. 2NF violations only occur with composite primary keys where a non-key column depends on part of the key.
+
+**SkillBarter Compliance:** All tables satisfy 2NF. The only table with a composite unique constraint is `user_badges(user_id, badge_id)`, but its primary key remains the single `id` column, and `earned_at` depends on the full combination of user and badge.
+
+#### Third Normal Form (3NF)
+
+A table is in 3NF when:
+- It satisfies 2NF
+- No non-key column depends on another non-key column (no transitive dependencies)
+
+**SkillBarter Analysis:**
+
+| Table | 3NF Status | Transitive Dependency | Justification |
+|-------|-----------|----------------------|---------------|
+| profiles | Violation | `rating` and `total_reviews` are derived from the `reviews` table. They transitively depend on `id` through the reviews data. | **Intentional denormalization.** Calculating AVG(rating) and COUNT(*) from reviews on every profile view would require expensive aggregate queries. The trigger `update_user_rating()` keeps these derived fields in sync automatically. |
+| profiles | Violation | `sessions_completed` is a count derivable from `sessions` WHERE status = 'completed'. | **Intentional denormalization.** Same rationale as rating: avoids COUNT queries on every profile/badge check. Updated atomically during session completion. |
+| profiles | Violation | `current_streak` and `longest_streak` are derived from session completion dates. | **Intentional denormalization.** Streak calculation requires scanning ordered session dates. Storing the computed value avoids this on every page load. |
+| wallets | Violation | `total_earned` and `total_spent` are derivable from SUM of transactions. `locked_credits` is derivable from SUM of active credit_locks. | **Intentional denormalization.** Wallet balance queries happen on nearly every authenticated page load. Aggregating transactions each time is impractical. |
+| listings | Compliant | `views_count` could be argued as derived, but it is a direct counter with no source table. | Fully dependent on the listing entity itself. |
+| all others | Compliant | No transitive dependencies detected. | Clean 3NF structure. |
+
+#### Boyce-Codd Normal Form (BCNF)
+
+A table is in BCNF when:
+- It satisfies 3NF
+- Every determinant is a candidate key
+
+All SkillBarter tables that satisfy 3NF also satisfy BCNF, because each table has a single candidate key (the `id` column) and no non-trivial functional dependencies where a non-key determines another column.
+
+The `wallets` table has `UNIQUE(user_id)`, making `user_id` an alternate candidate key. Since `user_id` determines all other columns (just like `id` does), this does not violate BCNF.
+
+#### Normalization Summary Table
+
+| Normal Form | Requirement | SkillBarter Status |
+|-------------|------------|-------------------|
+| 1NF | Atomic values, unique rows | Met (with noted `TEXT[]` exception) |
+| 2NF | No partial dependencies | Fully met (single-column PKs) |
+| 3NF | No transitive dependencies | Met with intentional denormalization in `profiles` and `wallets` |
+| BCNF | Every determinant is a candidate key | Met for all 3NF-compliant tables |
+
+### ACID Properties & Transaction Handling
+
+ACID (Atomicity, Consistency, Isolation, Durability) properties guarantee reliable database transactions. Here is how SkillBarter addresses each:
+
+#### Atomicity
+
+> A transaction is all-or-nothing. Either every operation in the transaction succeeds, or none of them take effect.
+
+**Implementation in SkillBarter:**
+
+The most critical atomic operation is **session completion with credit transfer**, which involves 7+ database operations:
+
+```
+1. UPDATE sessions SET status = 'completed'
+2. UPDATE wallets (requester) - deduct balance
+3. UPDATE wallets (provider) - add balance
+4. UPDATE credit_locks SET status = 'transferred'
+5. INSERT transactions (requester spend record)
+6. INSERT transactions (provider earn record)
+7. UPDATE profiles (sessions_completed, streak)
+```
+
+**Current approach:** These operations are executed as sequential Supabase client calls from the frontend. If any step fails mid-sequence, the database can be left in an inconsistent state (e.g., credits deducted but not credited).
+
+**Recommended improvement:** Wrap multi-step credit operations in a PostgreSQL function using `SECURITY DEFINER` so all steps execute within a single database transaction:
+```sql
+CREATE OR REPLACE FUNCTION complete_session(p_session_id UUID)
+RETURNS VOID AS $$
+BEGIN
+  -- All operations here are atomic
+  UPDATE sessions SET status = 'completed' WHERE id = p_session_id;
+  -- ... remaining steps ...
+  -- If any step fails, entire function rolls back
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+```
+
+#### Consistency
+
+> A transaction brings the database from one valid state to another. All constraints, triggers, and rules are satisfied.
+
+**Enforced through:**
+- **Foreign key constraints**: CASCADE and RESTRICT rules prevent orphaned records
+- **CHECK constraints**: `rating BETWEEN 1 AND 5`, status enums
+- **UNIQUE constraints**: One wallet per user, one badge earned per user per badge type
+- **NOT NULL constraints**: Required fields enforced at database level
+- **Triggers**: `handle_new_user()` ensures every auth user gets a profile, wallet, and welcome bonus atomically
+- **RLS policies**: Prevent unauthorized state mutations
+
+#### Isolation
+
+> Concurrent transactions do not interfere with each other. Each transaction sees a consistent snapshot of the database.
+
+**PostgreSQL default isolation level:** `READ COMMITTED` -- each statement within a transaction sees only data committed before that statement began.
+
+**Relevance to SkillBarter:**
+- **Credit balance reads**: A user checking their balance while another transaction is modifying it will see the committed balance, not a partial update
+- **Concurrent bookings**: If two users try to book the same listing simultaneously, RLS and application-level balance checks prevent double-spending
+- **Review triggers**: The `update_user_rating()` trigger recalculates the average within the same transaction as the INSERT, ensuring consistency
+
+#### Durability
+
+> Once a transaction is committed, it remains committed even in the event of a system failure.
+
+**Handled by Supabase/PostgreSQL:**
+- Write-ahead logging (WAL) ensures committed transactions survive crashes
+- Supabase provides automated backups (daily for free tier, point-in-time recovery on paid plans)
+- PostgreSQL `fsync` ensures data is written to disk before reporting commit success
+
+### Indexing Strategy
+
+Indexes accelerate query performance at the cost of additional storage and slower writes. SkillBarter uses indexes strategically on columns that appear in WHERE, JOIN, and ORDER BY clauses.
+
+#### Index Inventory
+
+| Table | Indexed Column(s) | Index Type | Rationale |
+|-------|-------------------|-----------|-----------|
+| profiles | `id` (PK) | B-tree (unique) | Primary key lookups for every profile fetch |
+| wallets | `id` (PK) | B-tree (unique) | Primary key |
+| wallets | `user_id` (UNIQUE) | B-tree (unique) | Wallet lookup by authenticated user on every page load |
+| listings | `id` (PK) | B-tree (unique) | Listing detail page lookups |
+| listings | `user_id` | B-tree | "My Listings" page filters by owner |
+| listings | `category_id` | B-tree | Discover page filters by category |
+| listings | `status` | B-tree | Discover page filters active listings |
+| requests | `id` (PK) | B-tree (unique) | Request detail lookups |
+| requests | `user_id` | B-tree | "My Requests" filtering |
+| requests | `status` | B-tree | Browse open requests |
+| sessions | `id` (PK) | B-tree (unique) | Session detail page |
+| sessions | `provider_id` | B-tree | Provider's session list |
+| sessions | `requester_id` | B-tree | Requester's session list |
+| sessions | `status` | B-tree | Filter sessions by status tab |
+| reviews | `reviewed_user_id` | B-tree | Profile page loads all reviews for a user |
+| reviews | `session_id` | B-tree | Check if review exists for a session |
+| transactions | `user_id` | B-tree | Wallet page loads transaction history |
+| user_badges | `user_id` | B-tree | Profile/badges page loads earned badges |
+| user_badges | `(user_id, badge_id)` | B-tree (unique) | Prevent duplicate badge awards |
+
+#### Index Type Selection
+
+- **B-tree (default)**: Used for equality (`=`) and range (`<`, `>`, `BETWEEN`) queries. Suitable for all current SkillBarter queries.
+- **GIN (Generalized Inverted Index)**: Would be appropriate for `profiles.skills_offered` if array containment queries (`@>`) are added for skill-based search.
+- **GiST / Full-text**: Not currently needed. Could be added for fuzzy text search on listing titles/descriptions if the search feature evolves beyond simple `ILIKE` patterns.
+
+### Referential Integrity & Constraints
+
+Referential integrity ensures that relationships between tables remain consistent. Every foreign key reference must point to an existing row in the parent table.
+
+#### Foreign Key Actions
+
+| Child Table | Foreign Key | Parent Table | ON DELETE | ON UPDATE | Rationale |
+|-------------|------------|-------------|-----------|-----------|-----------|
+| profiles | `id` | auth.users | CASCADE | CASCADE | Deleting an auth user removes their profile |
+| wallets | `user_id` | auth.users | CASCADE | CASCADE | User deletion cleans up wallet |
+| listings | `user_id` | profiles | CASCADE | CASCADE | User deletion removes their listings |
+| listings | `category_id` | categories | RESTRICT | CASCADE | Cannot delete a category that has listings |
+| requests | `user_id` | profiles | CASCADE | CASCADE | User deletion removes their requests |
+| requests | `category_id` | categories | RESTRICT | CASCADE | Cannot delete a category with active requests |
+| sessions | `listing_id` | listings | SET NULL | CASCADE | Listing deletion does not destroy session history |
+| sessions | `request_id` | requests | SET NULL | CASCADE | Request deletion does not destroy session history |
+| sessions | `provider_id` | profiles | CASCADE | CASCADE | Provider deletion cascades |
+| sessions | `requester_id` | profiles | CASCADE | CASCADE | Requester deletion cascades |
+| credit_locks | `user_id` | auth.users | CASCADE | CASCADE | Clean up locks on user deletion |
+| credit_locks | `session_id` | sessions | CASCADE | CASCADE | Session deletion releases locks |
+| reviews | `session_id` | sessions | CASCADE | CASCADE | Session deletion removes its reviews |
+| reviews | `reviewer_id` | profiles | CASCADE | CASCADE | Reviewer deletion removes their reviews |
+| reviews | `reviewed_user_id` | profiles | CASCADE | CASCADE | Reviewed user deletion removes reviews about them |
+| user_badges | `user_id` | auth.users | CASCADE | CASCADE | User deletion removes earned badges |
+| user_badges | `badge_id` | badges | CASCADE | CASCADE | Badge deletion removes all awards of that badge |
+| transactions | `user_id` | auth.users | CASCADE | CASCADE | User deletion removes transaction history |
+| transactions | `other_user_id` | auth.users | SET NULL | CASCADE | Other user deletion preserves transaction but nullifies reference |
+| transactions | `session_id` | sessions | SET NULL | CASCADE | Session deletion preserves transaction record |
+
+#### Cascade Deletion Chain
+
+When an `auth.users` record is deleted, the following cascade occurs:
+```
+auth.users DELETE
+  ├─ profiles CASCADE
+  │    ├─ listings CASCADE
+  │    │    └─ sessions SET NULL (listing_id becomes NULL)
+  │    ├─ requests CASCADE
+  │    │    └─ sessions SET NULL (request_id becomes NULL)
+  │    ├─ sessions CASCADE (as provider or requester)
+  │    │    ├─ credit_locks CASCADE
+  │    │    ├─ reviews CASCADE
+  │    │    └─ transactions SET NULL (session_id becomes NULL)
+  │    └─ reviews CASCADE (as reviewer or reviewed_user)
+  ├─ wallets CASCADE
+  ├─ user_badges CASCADE
+  └─ transactions CASCADE (as user_id)
+      └─ transactions SET NULL (as other_user_id for counterparty records)
+```
+
+### Denormalization Decisions
+
+While normalization reduces redundancy, SkillBarter intentionally denormalizes specific fields for performance. Each decision is documented below with its trade-off analysis.
+
+| Denormalized Field | Table | Normalized Alternative | Read Frequency | Write Frequency | Trade-off |
+|-------------------|-------|----------------------|----------------|-----------------|-----------|
+| `rating` | profiles | `SELECT AVG(rating) FROM reviews WHERE reviewed_user_id = ?` | Every profile view, listing card, search result | Only on new review (trigger) | Avoids aggregate query on high-traffic pages |
+| `total_reviews` | profiles | `SELECT COUNT(*) FROM reviews WHERE reviewed_user_id = ?` | Same as rating | Same as rating | Bundled with rating update |
+| `sessions_completed` | profiles | `SELECT COUNT(*) FROM sessions WHERE (provider_id = ? OR requester_id = ?) AND status = 'completed'` | Profile view, badge checks, dashboard | On session completion only | Avoids scanning sessions table |
+| `current_streak` / `longest_streak` | profiles | Compute from ordered session dates | Profile view, badge checks | On session completion | Complex date arithmetic avoided on reads |
+| `balance` / `locked_credits` / `total_earned` / `total_spent` | wallets | Compute from SUM of transactions grouped by type | Every authenticated page (header balance) | On booking, completion, cancellation | Most frequently read data in the system |
+| `views_count` | listings | Separate `listing_views` table with COUNT | Every listing card render | On each listing detail page visit | Avoids JOIN + COUNT for browse pages |
+
+**Consistency Mechanism:** All denormalized fields are kept in sync through PostgreSQL triggers (`update_user_rating()`, `handle_new_user()`) and application-level atomic update sequences. The triggers execute within the same transaction as the triggering INSERT/UPDATE, ensuring the denormalized value is never stale after a committed write.
+
+### Database Triggers & Functions
+
+PostgreSQL triggers automate critical operations that must happen reliably without depending on application code.
+
+#### `handle_new_user()` -- Signup Automation
+
+```
+Event:    AFTER INSERT ON auth.users
+Timing:   Fires once per new user registration
+Security: SECURITY DEFINER (runs with table owner privileges)
+
+Operations:
+  1. INSERT INTO profiles (id, name, email) using auth metadata
+  2. INSERT INTO wallets (user_id, balance: 10, total_earned: 10)
+  3. INSERT INTO transactions (type: 'signup_bonus', credits: +10)
+  4. INSERT INTO user_badges (badge: 'early-adopter')
+```
+
+This trigger ensures that every authenticated user has a complete set of associated records regardless of whether the frontend correctly executes post-signup logic.
+
+#### `update_user_rating()` -- Rating Aggregation
+
+```
+Event:    AFTER INSERT ON reviews
+Timing:   Fires once per new review
+Security: SECURITY DEFINER
+
+Operations:
+  1. SELECT AVG(rating), COUNT(*) FROM reviews WHERE reviewed_user_id = NEW.reviewed_user_id
+  2. UPDATE profiles SET rating = avg_result, total_reviews = count_result
+```
+
+This trigger maintains the denormalized `rating` and `total_reviews` fields in the `profiles` table, keeping them consistent with the actual reviews data.
+
+### Entity Relationship Cardinalities
+
+| Relationship | Cardinality | Description |
+|-------------|-------------|-------------|
+| auth.users : profiles | 1 : 1 | Each user has exactly one profile |
+| auth.users : wallets | 1 : 1 | Each user has exactly one wallet |
+| profiles : listings | 1 : N | A user can create many listings |
+| profiles : requests | 1 : N | A user can create many requests |
+| profiles : sessions (as provider) | 1 : N | A user can provide many sessions |
+| profiles : sessions (as requester) | 1 : N | A user can request many sessions |
+| listings : sessions | 1 : N | A listing can generate many sessions |
+| requests : sessions | 1 : N | A request can generate many sessions |
+| categories : listings | 1 : N | A category contains many listings |
+| categories : requests | 1 : N | A category contains many requests |
+| sessions : reviews | 1 : N | A session can have up to 2 reviews (one per participant) |
+| sessions : credit_locks | 1 : 1 | Each session has exactly one credit lock |
+| sessions : transactions | 1 : N | A session generates multiple transaction records |
+| badges : user_badges | 1 : N | A badge can be earned by many users |
+| profiles : user_badges | 1 : N | A user can earn many badges |
+| user_badges | M : N | Junction table resolving the many-to-many between profiles and badges |
+
+### Data Dictionary
+
+A complete reference of all columns across all tables, their data types, constraints, and business meaning.
+
+#### Core Data Types Used
+
+| PostgreSQL Type | Usage | Example |
+|----------------|-------|---------|
+| `UUID` | All primary keys and foreign keys | `gen_random_uuid()` |
+| `TEXT` | Variable-length strings | names, descriptions, emails |
+| `TEXT[]` | Array of strings | `skills_offered` in profiles |
+| `INTEGER` | Whole numbers | credits, counts, durations |
+| `NUMERIC(3,2)` | Fixed-precision decimal | rating (e.g., 4.75) |
+| `TIMESTAMPTZ` | Timestamp with timezone | created_at, scheduled_time |
+| `DATE` | Calendar date without time | last_session_date |
+| `BOOLEAN` | True/false | provider_confirmed, requester_confirmed |
+
+#### Status Enums (Application-Level)
+
+Rather than PostgreSQL ENUM types, SkillBarter uses TEXT columns with application-level validation for flexibility in adding new statuses without migrations.
+
+| Entity | Status Values | Lifecycle |
+|--------|--------------|-----------|
+| Listing | `active`, `paused`, `deleted` | active -> paused -> active (toggle) or active -> deleted |
+| Request | `open`, `accepted`, `completed`, `cancelled` | open -> accepted -> completed, or open -> cancelled |
+| Session | `pending`, `accepted`, `in_progress`, `completed`, `cancelled` | pending -> accepted -> in_progress -> completed, or any -> cancelled |
+| Credit Lock | `locked`, `released`, `transferred` | locked -> released (cancel) or locked -> transferred (complete) |
+| Transaction | `signup_bonus`, `earn`, `spend`, `refund`, `lock`, `unlock` | Immutable once created (append-only ledger) |
 
 ---
 
@@ -2119,7 +2460,7 @@ supabase/
 - Vite, ESLint
 - Team effort and dedication
 
-**Last Updated**: March 16, 2026
+**Last Updated**: April 8, 2026
 
 ---
 
