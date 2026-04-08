@@ -146,7 +146,7 @@ export function SessionDetail() {
           .from('wallets')
           .select('*')
           .eq('user_id', session.requester_id)
-          .single();
+          .maybeSingle();
 
         if (requesterWallet) {
           const rw = requesterWallet as { locked_credits: number; total_spent: number };
@@ -163,7 +163,7 @@ export function SessionDetail() {
           .from('wallets')
           .select('*')
           .eq('user_id', session.provider_id)
-          .single();
+          .maybeSingle();
 
         if (providerWallet) {
           const pw = providerWallet as { balance: number; total_earned: number };
@@ -252,7 +252,7 @@ export function SessionDetail() {
         .from('wallets')
         .select('*')
         .eq('user_id', session.requester_id)
-        .single();
+        .maybeSingle();
 
       if (wallet) {
         await supabase
@@ -318,7 +318,7 @@ export function SessionDetail() {
         .from('wallets')
         .select('*')
         .eq('user_id', session.requester_id)
-        .single();
+        .maybeSingle();
 
       if (wallet) {
         await supabase

@@ -24,7 +24,7 @@ export function Requests() {
         .from('requests')
         .select(`
           *,
-          profiles!requests_user_id_fkey(*),
+          profiles!requests_user_id_profiles_fkey(*),
           categories!requests_category_id_fkey(*)
         `)
         .eq('status', 'open')

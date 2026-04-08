@@ -80,7 +80,7 @@ export function Profile() {
           .limit(4),
         supabase
           .from('reviews')
-          .select(`*, profiles!reviews_reviewer_id_fkey(name, avatar_url)`)
+          .select(`*, profiles!reviews_reviewer_id_profiles_fkey(name, avatar_url)`)
           .eq('reviewed_user_id', profileId)
           .order('created_at', { ascending: false })
           .limit(5),

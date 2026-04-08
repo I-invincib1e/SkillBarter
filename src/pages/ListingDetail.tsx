@@ -64,7 +64,7 @@ export function ListingDetail() {
           .from('reviews')
           .select(`
             *,
-            profiles!reviews_reviewer_id_fkey(name, avatar_url)
+            profiles!reviews_reviewer_id_profiles_fkey(name, avatar_url)
           `)
           .eq('reviewed_user_id', listingData.user_id)
           .order('created_at', { ascending: false })
