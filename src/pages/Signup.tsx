@@ -165,16 +165,37 @@ export function Signup() {
                 required
               />
 
-              <Input
-                type="password"
-                label="Password"
-                placeholder="At least 6 characters"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                icon={<Lock className="w-5 h-5" />}
-                required
-                minLength={6}
-              />
+              <div>
+                <Input
+                  type="password"
+                  label="Password"
+                  placeholder="At least 6 characters"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  icon={<Lock className="w-5 h-5" />}
+                  required
+                  minLength={6}
+                />
+                {password.length > 0 && (
+                  <div className="mt-2">
+                    <div className="flex gap-1">
+                      {[1, 2, 3, 4].map((level) => {
+                        const strength = (password.length >= 6 ? 1 : 0) + (password.length >= 8 ? 1 : 0) + (/[A-Z]/.test(password) && /[a-z]/.test(password) ? 1 : 0) + (/\d/.test(password) || /[^a-zA-Z0-9]/.test(password) ? 1 : 0);
+                        const colors = ['bg-red-400', 'bg-yellow-400', 'bg-emerald-400', 'bg-emerald-500'];
+                        return (
+                          <div
+                            key={level}
+                            className={`h-1 flex-1 rounded-full transition-all duration-300 ${level <= strength ? colors[strength - 1] : 'bg-gray-200 dark:bg-white/10'}`}
+                          />
+                        );
+                      })}
+                    </div>
+                    <p className="text-[11px] text-gray-400 mt-1">
+                      {password.length < 6 ? 'Too short' : password.length < 8 ? 'Weak' : /[A-Z]/.test(password) && /\d/.test(password) ? 'Strong' : 'Medium'}
+                    </p>
+                  </div>
+                )}
+              </div>
 
               <Button type="submit" className="w-full" loading={loading}>
                 Create Account

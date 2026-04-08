@@ -94,49 +94,21 @@ export function ListingDetail() {
 
     setSubmitting(true);
 
-    const { data: session, error: sessionError } = await supabase
-      .from('sessions')
-      .insert({
-        listing_id: listing.id,
-        provider_id: listing.user_id,
-        requester_id: user.id,
-        scheduled_time: scheduledTime.toISOString(),
-        duration_minutes: listing.duration_minutes,
-        credits_amount: listing.price_credits,
-        message: bookingMessage,
-        status: 'pending',
-      })
-      .select()
-      .single();
+    const { data, error } = await supabase.rpc('book_session', {
+      p_listing_id: listing.id,
+      p_provider_id: listing.user_id,
+      p_requester_id: user.id,
+      p_scheduled_time: scheduledTime.toISOString(),
+      p_duration_minutes: listing.duration_minutes,
+      p_credits_amount: listing.price_credits,
+      p_message: bookingMessage,
+    });
 
-    if (sessionError) {
-      showToast('Failed to create session', 'error');
+    if (error || data?.error) {
+      showToast(data?.error || 'Failed to create session', 'error');
       setSubmitting(false);
       return;
     }
-
-    await supabase.from('credit_locks').insert({
-      user_id: user.id,
-      session_id: session.id,
-      credits: listing.price_credits,
-      status: 'locked',
-    });
-
-    await supabase
-      .from('wallets')
-      .update({
-        balance: wallet.balance - listing.price_credits,
-        locked_credits: wallet.locked_credits + listing.price_credits,
-      })
-      .eq('user_id', user.id);
-
-    await supabase.from('transactions').insert({
-      user_id: user.id,
-      session_id: session.id,
-      credits: listing.price_credits,
-      type: 'lock',
-      description: `Credits locked for session with ${listing.profiles.name}`,
-    });
 
     await refreshWallet();
     showToast('Session requested successfully!', 'success');
@@ -172,13 +144,13 @@ export function ListingDetail() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
-      <button
-        onClick={() => navigate(-1)}
-        className="flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white transition-colors font-medium"
+      <Link
+        to="/discover"
+        className="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white transition-colors font-medium"
       >
         <ArrowLeft className="w-5 h-5" />
-        Back
-      </button>
+        Discover
+      </Link>
 
       <Card>
         <div className="flex flex-col md:flex-row md:items-start gap-6">

@@ -5,11 +5,10 @@ interface SkeletonProps {
 export function Skeleton({ className = '' }: SkeletonProps) {
   return (
     <div
-      className={`
-        animate-pulse bg-gray-200 dark:bg-white/5 rounded-xl
-        ${className}
-      `}
-    />
+      className={`relative overflow-hidden bg-gray-200 dark:bg-white/5 rounded-xl ${className}`}
+    >
+      <div className="absolute inset-0 skeleton-shimmer" />
+    </div>
   );
 }
 

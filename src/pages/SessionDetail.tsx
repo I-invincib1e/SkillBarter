@@ -11,6 +11,7 @@ import {
   MessageSquare,
   Lock,
   Star,
+  AlertTriangle,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -37,6 +38,7 @@ export function SessionDetail() {
   const [confirming, setConfirming] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState('');
   const [submittingReview, setSubmittingReview] = useState(false);
@@ -101,176 +103,65 @@ export function SessionDetail() {
   const isProvider = session.provider_id === user.id;
   const otherUser = isProvider ? session.requester : session.provider;
   const scheduledDate = new Date(session.scheduled_time);
-  const canConfirm = scheduledDate < new Date(Date.now() - 10 * 60 * 1000);
+  const sessionEndTime = new Date(scheduledDate.getTime() + session.duration_minutes * 60 * 1000);
+  const canConfirm = sessionEndTime < new Date();
   const hasConfirmed = isProvider ? session.provider_confirmed : session.requester_confirmed;
   const bothConfirmed = session.provider_confirmed && session.requester_confirmed;
+
+  const completedAt = session.completed_at ? new Date(session.completed_at) : null;
+  const reviewWindowOpen = completedAt
+    ? (new Date().getTime() - completedAt.getTime()) < 7 * 24 * 60 * 60 * 1000
+    : true;
 
   const handleConfirm = async () => {
     setConfirming(true);
 
-    const updateField = isProvider
-      ? { provider_confirmed: true, provider_confirmed_at: new Date().toISOString() }
-      : { requester_confirmed: true, requester_confirmed_at: new Date().toISOString() };
+    const { data, error } = await supabase.rpc('complete_session', {
+      p_session_id: session.id,
+      p_user_id: user.id,
+    });
 
-    await supabase
-      .from('sessions')
-      .update(updateField)
-      .eq('id', session.id);
-
-    const { data: updatedSession } = await supabase
-      .from('sessions')
-      .select('provider_confirmed, requester_confirmed')
-      .eq('id', session.id)
-      .single();
-
-    if (updatedSession?.provider_confirmed && updatedSession?.requester_confirmed) {
-      await supabase
-        .from('sessions')
-        .update({ status: 'completed', completed_at: new Date().toISOString() })
-        .eq('id', session.id);
-
-      const { data: creditLock } = await supabase
-        .from('credit_locks')
-        .select('*')
-        .eq('session_id', session.id)
-        .eq('status', 'locked')
-        .maybeSingle();
-
-      if (creditLock) {
-        await supabase
-          .from('credit_locks')
-          .update({ status: 'transferred', released_at: new Date().toISOString() })
-          .eq('id', (creditLock as { id: string }).id);
-
-        const { data: requesterWallet } = await supabase
-          .from('wallets')
-          .select('*')
-          .eq('user_id', session.requester_id)
-          .maybeSingle();
-
-        if (requesterWallet) {
-          const rw = requesterWallet as { locked_credits: number; total_spent: number };
-          await supabase
-            .from('wallets')
-            .update({
-              locked_credits: rw.locked_credits - session.credits_amount,
-              total_spent: rw.total_spent + session.credits_amount,
-            })
-            .eq('user_id', session.requester_id);
-        }
-
-        const { data: providerWallet } = await supabase
-          .from('wallets')
-          .select('*')
-          .eq('user_id', session.provider_id)
-          .maybeSingle();
-
-        if (providerWallet) {
-          const pw = providerWallet as { balance: number; total_earned: number };
-          await supabase
-            .from('wallets')
-            .update({
-              balance: pw.balance + session.credits_amount,
-              total_earned: pw.total_earned + session.credits_amount,
-            })
-            .eq('user_id', session.provider_id);
-        }
-
-        await supabase.from('transactions').insert([
-          {
-            user_id: session.requester_id,
-            other_user_id: session.provider_id,
-            session_id: session.id,
-            credits: session.credits_amount,
-            type: 'spend',
-            description: `Session with ${session.provider.name}`,
-          },
-          {
-            user_id: session.provider_id,
-            other_user_id: session.requester_id,
-            session_id: session.id,
-            credits: session.credits_amount,
-            type: 'earn',
-            description: `Session with ${session.requester.name}`,
-          },
-        ]);
-
-        await supabase
-          .from('profiles')
-          .update({ sessions_completed: session.provider.sessions_completed + 1 })
-          .eq('id', session.provider_id);
-
-        await supabase
-          .from('profiles')
-          .update({ sessions_completed: session.requester.sessions_completed + 1 })
-          .eq('id', session.requester_id);
-      }
-
-      showToast('Session completed! Credits transferred.', 'success');
-      setShowReviewModal(true);
-    } else {
-      showToast('Confirmed! Waiting for the other party.', 'success');
+    if (error || data?.error) {
+      showToast(data?.error || 'Failed to confirm session', 'error');
+      setConfirming(false);
+      return;
     }
 
     await refreshWallet();
-    setSession((prev) =>
-      prev
-        ? {
-            ...prev,
-            ...updateField,
-            status: updatedSession?.provider_confirmed && updatedSession?.requester_confirmed ? 'completed' : prev.status,
-          }
-        : null
-    );
+    await refreshProfile();
+
+    if (data.both_confirmed) {
+      showToast('Session completed! Credits transferred.', 'success');
+      setSession((prev) => prev ? { ...prev, status: 'completed', ...(isProvider ? { provider_confirmed: true } : { requester_confirmed: true }) } : null);
+      setShowReviewModal(true);
+    } else {
+      showToast('Confirmed! Waiting for the other party.', 'success');
+      setSession((prev) =>
+        prev
+          ? {
+              ...prev,
+              ...(isProvider
+                ? { provider_confirmed: true, provider_confirmed_at: new Date().toISOString() }
+                : { requester_confirmed: true, requester_confirmed_at: new Date().toISOString() }),
+            }
+          : null
+      );
+    }
     setConfirming(false);
   };
 
   const handleCancel = async () => {
-    if (!confirm('Are you sure you want to cancel this session?')) return;
-
     setCancelling(true);
 
-    await supabase
-      .from('sessions')
-      .update({ status: 'cancelled' })
-      .eq('id', session.id);
+    const { data, error } = await supabase.rpc('cancel_session', {
+      p_session_id: session.id,
+      p_user_id: user.id,
+    });
 
-    const { data: creditLock } = await supabase
-      .from('credit_locks')
-      .select('*')
-      .eq('session_id', session.id)
-      .eq('status', 'locked')
-      .maybeSingle();
-
-    if (creditLock) {
-      await supabase
-        .from('credit_locks')
-        .update({ status: 'released', released_at: new Date().toISOString() })
-        .eq('id', creditLock.id);
-
-      const { data: wallet } = await supabase
-        .from('wallets')
-        .select('*')
-        .eq('user_id', session.requester_id)
-        .maybeSingle();
-
-      if (wallet) {
-        await supabase
-          .from('wallets')
-          .update({
-            balance: wallet.balance + session.credits_amount,
-            locked_credits: wallet.locked_credits - session.credits_amount,
-          })
-          .eq('user_id', session.requester_id);
-
-        await supabase.from('transactions').insert({
-          user_id: session.requester_id,
-          session_id: session.id,
-          credits: session.credits_amount,
-          type: 'unlock',
-          description: 'Session cancelled - credits refunded',
-        });
-      }
+    if (error || data?.error) {
+      showToast(data?.error || 'Failed to cancel session', 'error');
+      setCancelling(false);
+      return;
     }
 
     await refreshWallet();
@@ -292,43 +183,17 @@ export function SessionDetail() {
   };
 
   const handleDecline = async () => {
-    if (!confirm('Are you sure you want to decline this session?')) return;
-
     setCancelling(true);
 
-    await supabase
-      .from('sessions')
-      .update({ status: 'cancelled' })
-      .eq('id', session.id);
+    const { data, error } = await supabase.rpc('cancel_session', {
+      p_session_id: session.id,
+      p_user_id: user.id,
+    });
 
-    const { data: creditLock } = await supabase
-      .from('credit_locks')
-      .select('*')
-      .eq('session_id', session.id)
-      .eq('status', 'locked')
-      .maybeSingle();
-
-    if (creditLock) {
-      await supabase
-        .from('credit_locks')
-        .update({ status: 'released', released_at: new Date().toISOString() })
-        .eq('id', creditLock.id);
-
-      const { data: wallet } = await supabase
-        .from('wallets')
-        .select('*')
-        .eq('user_id', session.requester_id)
-        .maybeSingle();
-
-      if (wallet) {
-        await supabase
-          .from('wallets')
-          .update({
-            balance: wallet.balance + session.credits_amount,
-            locked_credits: wallet.locked_credits - session.credits_amount,
-          })
-          .eq('user_id', session.requester_id);
-      }
+    if (error || data?.error) {
+      showToast(data?.error || 'Failed to decline session', 'error');
+      setCancelling(false);
+      return;
     }
 
     showToast('Session declined.', 'info');
@@ -349,7 +214,7 @@ export function SessionDetail() {
     });
 
     if (reviewError) {
-      showToast('Failed to submit review', 'error');
+      showToast(reviewError.message.includes('unique') ? 'You already reviewed this session' : 'Failed to submit review', 'error');
       setSubmittingReview(false);
       return;
     }
@@ -374,13 +239,13 @@ export function SessionDetail() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
-      <button
-        onClick={() => navigate(-1)}
-        className="flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white transition-colors"
+      <Link
+        to="/sessions"
+        className="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white transition-colors"
       >
         <ArrowLeft className="w-5 h-5" />
-        Back
-      </button>
+        <span>Sessions</span>
+      </Link>
 
       <Card>
         <div className="flex items-center justify-between mb-6">
@@ -405,7 +270,11 @@ export function SessionDetail() {
             >
               {otherUser.name}
             </Link>
-            <StarRating rating={otherUser.rating} size="sm" showValue />
+            {otherUser.total_reviews >= 3 ? (
+              <StarRating rating={otherUser.rating} size="sm" showValue />
+            ) : (
+              <span className="text-xs text-gray-400 font-medium">New Provider</span>
+            )}
           </div>
         </div>
 
@@ -479,7 +348,7 @@ export function SessionDetail() {
             <Button
               variant="secondary"
               className="flex-1"
-              onClick={handleDecline}
+              onClick={() => setShowCancelModal(true)}
               loading={cancelling}
             >
               <XCircle className="w-4 h-4 mr-2" />
@@ -522,7 +391,7 @@ export function SessionDetail() {
               <div className="flex items-center gap-2 p-3 rounded-xl bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400">
                 <Lock className="w-5 h-5 shrink-0" />
                 <p className="text-sm">
-                  You can confirm completion 10 minutes after the scheduled time
+                  You can confirm completion after the session ends ({sessionEndTime.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })})
                 </p>
               </div>
             )}
@@ -547,7 +416,7 @@ export function SessionDetail() {
               <Button
                 variant="secondary"
                 className="w-full"
-                onClick={handleCancel}
+                onClick={() => setShowCancelModal(true)}
                 loading={cancelling}
               >
                 Cancel Session
@@ -556,11 +425,18 @@ export function SessionDetail() {
           </div>
         )}
 
-        {session.status === 'completed' && !hasReviewed && (
+        {session.status === 'completed' && !hasReviewed && reviewWindowOpen && (
           <Button className="w-full" onClick={() => setShowReviewModal(true)}>
             <Star className="w-4 h-4 mr-2" />
             Leave a Review
           </Button>
+        )}
+
+        {session.status === 'completed' && !hasReviewed && !reviewWindowOpen && (
+          <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 dark:bg-dark-surface text-gray-500">
+            <Clock className="w-5 h-5 shrink-0" />
+            <p className="text-sm">Review window has closed (7 days)</p>
+          </div>
         )}
 
         {session.status === 'completed' && hasReviewed && (
@@ -570,6 +446,41 @@ export function SessionDetail() {
           </div>
         )}
       </Card>
+
+      <Modal
+        isOpen={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        title={session.status === 'pending' ? 'Decline Session' : 'Cancel Session'}
+        size="sm"
+      >
+        <div className="space-y-4">
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-red-50 dark:bg-red-900/20">
+            <AlertTriangle className="w-5 h-5 text-red-500 shrink-0" />
+            <p className="text-sm text-red-700 dark:text-red-400">
+              {session.status === 'pending'
+                ? 'This will decline the session request. Credits will be refunded to the requester.'
+                : 'This will cancel the session. Locked credits will be refunded.'}
+            </p>
+          </div>
+
+          <div className="flex gap-3">
+            <Button
+              variant="secondary"
+              className="flex-1"
+              onClick={() => setShowCancelModal(false)}
+            >
+              Keep Session
+            </Button>
+            <Button
+              className="flex-1 !bg-red-600 hover:!bg-red-700 !text-white"
+              onClick={session.status === 'pending' ? handleDecline : handleCancel}
+              loading={cancelling}
+            >
+              {session.status === 'pending' ? 'Decline' : 'Cancel'}
+            </Button>
+          </div>
+        </div>
+      </Modal>
 
       <Modal
         isOpen={showReviewModal}

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ChevronDown, HelpCircle } from 'lucide-react';
-import { Card, Button } from '../components/ui';
+import { Card } from '../components/ui';
 
 export function FAQ() {
   const [openIndex, setOpenIndex] = useState(0);

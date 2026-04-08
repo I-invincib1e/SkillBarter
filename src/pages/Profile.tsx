@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
-  Calendar,
   MapPin,
   Star,
   Award,
@@ -21,12 +20,10 @@ import {
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import {
-  Card,
   Button,
   Avatar,
   Badge,
   StarRating,
-  RingChart,
   ProfileSkeleton,
 } from '../components/ui';
 import type {

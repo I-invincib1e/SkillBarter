@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Heart, Target, Lightbulb, Users, Award, Zap } from 'lucide-react';
+import { ArrowLeft, Heart, Target, Lightbulb, Users, Zap } from 'lucide-react';
 import { Button, Card } from '../components/ui';
 
 export function About() {

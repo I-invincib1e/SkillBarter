@@ -8,7 +8,7 @@ import { Card, Button, Avatar, Badge, Input, ListingSkeleton, Modal } from '../c
 import type { RequestWithDetails } from '../types/database';
 
 export function Requests() {
-  const { user } = useAuth();
+  const { user, refreshWallet } = useAuth();
   const { showToast } = useToast();
   const [requests, setRequests] = useState<RequestWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
@@ -16,6 +16,8 @@ export function Requests() {
   const [showAcceptModal, setShowAcceptModal] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<RequestWithDetails | null>(null);
   const [accepting, setAccepting] = useState(false);
+  const [acceptDate, setAcceptDate] = useState('');
+  const [acceptTime, setAcceptTime] = useState('');
 
   useEffect(() => {
     const fetchRequests = async () => {
@@ -31,7 +33,7 @@ export function Requests() {
         .order('created_at', { ascending: false });
 
       if (searchQuery) {
-        query = query.ilike('title', `%${searchQuery}%`);
+        query = query.or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
       }
 
       const { data } = await query;
@@ -39,76 +41,39 @@ export function Requests() {
       setLoading(false);
     };
 
-    fetchRequests();
+    const debounce = setTimeout(fetchRequests, 300);
+    return () => clearTimeout(debounce);
   }, [searchQuery]);
 
   const handleAcceptRequest = async () => {
-    if (!user || !selectedRequest) return;
+    if (!user || !selectedRequest || !acceptDate || !acceptTime) return;
+
+    const scheduledTime = new Date(`${acceptDate}T${acceptTime}`);
+    if (scheduledTime <= new Date()) {
+      showToast('Please select a future date and time', 'error');
+      return;
+    }
 
     setAccepting(true);
 
-    const scheduledTime = new Date();
-    scheduledTime.setHours(scheduledTime.getHours() + 1);
+    const { data, error } = await supabase.rpc('accept_request', {
+      p_request_id: selectedRequest.id,
+      p_provider_id: user.id,
+      p_scheduled_time: scheduledTime.toISOString(),
+    });
 
-    const { data: session, error } = await supabase
-      .from('sessions')
-      .insert({
-        request_id: selectedRequest.id,
-        provider_id: user.id,
-        requester_id: selectedRequest.user_id,
-        scheduled_time: scheduledTime.toISOString(),
-        duration_minutes: selectedRequest.duration_minutes,
-        credits_amount: selectedRequest.credits_offered,
-        status: 'accepted',
-      })
-      .select()
-      .single();
-
-    if (error) {
-      showToast('Failed to accept request', 'error');
+    if (error || data?.error) {
+      showToast(data?.error || 'Failed to accept request', 'error');
       setAccepting(false);
       return;
     }
 
-    await supabase
-      .from('requests')
-      .update({ status: 'accepted' })
-      .eq('id', selectedRequest.id);
-
-    await supabase.from('credit_locks').insert({
-      user_id: selectedRequest.user_id,
-      session_id: session.id,
-      credits: selectedRequest.credits_offered,
-      status: 'locked',
-    });
-
-    const { data: requesterWallet } = await supabase
-      .from('wallets')
-      .select('balance, locked_credits')
-      .eq('user_id', selectedRequest.user_id)
-      .maybeSingle();
-
-    if (requesterWallet) {
-      await supabase
-        .from('wallets')
-        .update({
-          balance: requesterWallet.balance - selectedRequest.credits_offered,
-          locked_credits: requesterWallet.locked_credits + selectedRequest.credits_offered,
-        })
-        .eq('user_id', selectedRequest.user_id);
-
-      await supabase.from('transactions').insert({
-        user_id: selectedRequest.user_id,
-        session_id: session.id,
-        credits: selectedRequest.credits_offered,
-        type: 'lock',
-        description: `Credits locked for help request: ${selectedRequest.title}`,
-      });
-    }
-
+    await refreshWallet();
     showToast('Request accepted! Session created.', 'success');
     setShowAcceptModal(false);
     setSelectedRequest(null);
+    setAcceptDate('');
+    setAcceptTime('');
     setRequests((prev) => prev.filter((r) => r.id !== selectedRequest.id));
     setAccepting(false);
   };
@@ -120,7 +85,7 @@ export function Requests() {
           <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-1">
             Help Requests
           </h1>
-          <p className="text-gray-500 dark:text-gray-400">
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
             See what students need help with
           </p>
         </div>
@@ -165,7 +130,7 @@ export function Requests() {
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
             No open requests
           </h3>
-          <p className="text-gray-500 dark:text-gray-400 mb-4">
+          <p className="text-gray-500 dark:text-gray-400 mb-4 text-sm">
             {searchQuery ? 'Try adjusting your search' : 'Be the first to post a request'}
           </p>
           <Link to="/requests/create">
@@ -179,6 +144,8 @@ export function Requests() {
         onClose={() => {
           setShowAcceptModal(false);
           setSelectedRequest(null);
+          setAcceptDate('');
+          setAcceptTime('');
         }}
         title="Accept Request"
         size="md"
@@ -202,22 +169,37 @@ export function Requests() {
             </div>
 
             <div className="p-4 rounded-xl bg-success-50 dark:bg-success-900/20">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Zap className="w-5 h-5 text-success-600" />
-                  <span className="font-medium text-success-700 dark:text-success-400">
-                    You'll earn {selectedRequest.credits_offered} credits
-                  </span>
-                </div>
+              <div className="flex items-center gap-2">
+                <Zap className="w-5 h-5 text-success-600" />
+                <span className="font-medium text-success-700 dark:text-success-400">
+                  You'll earn {selectedRequest.credits_offered} credits
+                </span>
               </div>
               <p className="text-sm text-success-600 dark:text-success-500 mt-1">
                 Credits will be transferred after session completion
               </p>
             </div>
 
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              By accepting, you agree to help {selectedRequest.profiles.name} with their request.
-              A session will be created and the requester will be notified.
+            <div className="grid grid-cols-2 gap-4">
+              <Input
+                type="date"
+                label="Proposed Date"
+                value={acceptDate}
+                onChange={(e) => setAcceptDate(e.target.value)}
+                min={new Date().toISOString().split('T')[0]}
+                required
+              />
+              <Input
+                type="time"
+                label="Proposed Time"
+                value={acceptTime}
+                onChange={(e) => setAcceptTime(e.target.value)}
+                required
+              />
+            </div>
+
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Propose a time for the session. The requester's credits will be locked when you accept.
             </p>
 
             <div className="flex gap-3 pt-2">
@@ -227,6 +209,8 @@ export function Requests() {
                 onClick={() => {
                   setShowAcceptModal(false);
                   setSelectedRequest(null);
+                  setAcceptDate('');
+                  setAcceptTime('');
                 }}
               >
                 Cancel
@@ -235,6 +219,7 @@ export function Requests() {
                 className="flex-1"
                 onClick={handleAcceptRequest}
                 loading={accepting}
+                disabled={!acceptDate || !acceptTime}
               >
                 Accept Request
               </Button>
