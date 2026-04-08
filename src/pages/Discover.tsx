@@ -25,7 +25,7 @@ export function Discover() {
       setLoading(true);
       let query = supabase
         .from('listings')
-        .select(`*, profiles!listings_user_id_fkey(*), categories!listings_category_id_fkey(*)`)
+        .select(`*, profiles!listings_user_id_profiles_fkey(*), categories!listings_category_id_fkey(*)`)
         .eq('status', 'active')
         .order('created_at', { ascending: false });
 

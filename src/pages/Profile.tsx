@@ -73,7 +73,7 @@ export function Profile() {
         supabase.from('profiles').select('*').eq('id', profileId).maybeSingle(),
         supabase
           .from('listings')
-          .select(`*, profiles!listings_user_id_fkey(*), categories!listings_category_id_fkey(*)`)
+          .select(`*, profiles!listings_user_id_profiles_fkey(*), categories!listings_category_id_fkey(*)`)
           .eq('user_id', profileId)
           .eq('status', 'active')
           .order('created_at', { ascending: false })

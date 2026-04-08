@@ -51,7 +51,7 @@ export function ListingDetail() {
         .from('listings')
         .select(`
           *,
-          profiles!listings_user_id_fkey(*),
+          profiles!listings_user_id_profiles_fkey(*),
           categories!listings_category_id_fkey(*)
         `)
         .eq('id', id)
