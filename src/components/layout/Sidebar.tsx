@@ -24,7 +24,7 @@ const mainNav = [
   { path: '/listings', label: 'Listings', icon: FileText },
   { path: '/requests', label: 'Requests', icon: Bell },
   { path: '/sessions', label: 'Sessions', icon: Zap },
-  { path: '/liza', label: 'LIZA', icon: Sparkles },
+  { path: '/zeno', label: 'Zeno', icon: Sparkles },
 ];
 
 const bottomNav = [

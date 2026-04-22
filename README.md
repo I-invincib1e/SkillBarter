@@ -19,7 +19,7 @@ SkillBarter connects students who want to learn with those who can teach. Instea
 - **Credit Wallet** - Track your balance, earnings, and spending
 - **Badges & Streaks** - Gamification to encourage participation
 - **Categories** - Browse by subject area (Programming, Math, Languages, etc.)
-- **LIZA -- AI Tutor** - Personalized assistant that chats, generates flashcards, and creates MCQ quizzes from prompts, PDFs, or the current conversation
+- **Zeno -- AI Tutor** - Personalized assistant that chats, generates flashcards, and creates MCQ quizzes from prompts, PDFs, or the current conversation
 
 ## Tech Stack
 
@@ -86,7 +86,7 @@ The app uses Supabase with the following main tables:
 - `user_badges` - Earned badges per user
 - `categories` - Skill categories
 
-LIZA AI tutor tables:
+Zeno AI tutor tables:
 
 - `liza_conversations` / `liza_messages` - Chat threads and streaming messages
 - `liza_flashcard_sets` / `liza_flashcards` - Generated flip-card decks

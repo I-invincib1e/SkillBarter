@@ -5,19 +5,19 @@ import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../components/ui/Toast';
 import {
   streamChat,
-  type LizaConversation,
-  type LizaMessage,
-  type LizaFlashcard,
-  type LizaQuizQuestion,
-} from '../lib/liza';
+  type ZenoConversation,
+  type ZenoMessage,
+  type ZenoFlashcard,
+  type ZenoQuizQuestion,
+} from '../lib/zeno';
 import { extractFile, MAX_PDF_BYTES } from '../lib/pdfText';
-import { ChatMessage } from '../components/liza/ChatMessage';
-import { ChatInput } from '../components/liza/ChatInput';
-import { ConversationSidebar } from '../components/liza/ConversationSidebar';
-import { WelcomeScreen } from '../components/liza/WelcomeScreen';
-import { StudioPanel } from '../components/liza/StudioPanel';
-import { FlashcardViewer } from '../components/liza/FlashcardViewer';
-import { QuizRunner } from '../components/liza/QuizRunner';
+import { ChatMessage } from '../components/zeno/ChatMessage';
+import { ChatInput } from '../components/zeno/ChatInput';
+import { ConversationSidebar } from '../components/zeno/ConversationSidebar';
+import { WelcomeScreen } from '../components/zeno/WelcomeScreen';
+import { StudioPanel } from '../components/zeno/StudioPanel';
+import { FlashcardViewer } from '../components/zeno/FlashcardViewer';
+import { QuizRunner } from '../components/zeno/QuizRunner';
 
 type DisplayMessage = {
   id: string;
@@ -26,11 +26,11 @@ type DisplayMessage = {
   streaming?: boolean;
 };
 
-export function Liza() {
+export function Zeno() {
   const { profile } = useAuth();
   const { showToast } = useToast();
 
-  const [conversations, setConversations] = useState<LizaConversation[]>([]);
+  const [conversations, setConversations] = useState<ZenoConversation[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [messages, setMessages] = useState<DisplayMessage[]>([]);
   const [loadingMessages, setLoadingMessages] = useState(false);
@@ -43,12 +43,12 @@ export function Liza() {
 
   const [flashcardView, setFlashcardView] = useState<{
     title: string;
-    cards: LizaFlashcard[];
+    cards: ZenoFlashcard[];
   } | null>(null);
   const [quizView, setQuizView] = useState<{
     id: string;
     title: string;
-    questions: LizaQuizQuestion[];
+    questions: ZenoQuizQuestion[];
   } | null>(null);
 
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -68,7 +68,7 @@ export function Liza() {
       .from('liza_conversations')
       .select('*')
       .order('updated_at', { ascending: false });
-    setConversations((data as LizaConversation[]) || []);
+    setConversations((data as ZenoConversation[]) || []);
   };
 
   const loadMessages = async (conversationId: string) => {
@@ -78,7 +78,7 @@ export function Liza() {
       .select('*')
       .eq('conversation_id', conversationId)
       .order('created_at', { ascending: true });
-    const msgs: DisplayMessage[] = ((data as LizaMessage[]) || [])
+    const msgs: DisplayMessage[] = ((data as ZenoMessage[]) || [])
       .filter((m) => m.role !== 'system')
       .map((m) => ({
         id: m.id,
@@ -234,7 +234,7 @@ export function Liza() {
       showToast('Could not open flashcards', 'error');
       return;
     }
-    setFlashcardView({ title: setData.title, cards: cards as LizaFlashcard[] });
+    setFlashcardView({ title: setData.title, cards: cards as ZenoFlashcard[] });
     setStudioRefresh((n) => n + 1);
   };
 
@@ -256,7 +256,7 @@ export function Liza() {
     setQuizView({
       id: quizId,
       title: quizData.title,
-      questions: questions as LizaQuizQuestion[],
+      questions: questions as ZenoQuizQuestion[],
     });
     setStudioRefresh((n) => n + 1);
   };
@@ -290,10 +290,10 @@ export function Liza() {
               <div className="font-space font-bold text-sm text-gray-900 dark:text-white truncate">
                 {activeId
                   ? conversations.find((c) => c.id === activeId)?.title || 'Chat'
-                  : 'LIZA'}
+                  : 'Zeno'}
               </div>
               <div className="text-[10px] uppercase tracking-wider font-semibold text-gray-500 dark:text-gray-400">
-                Learning Integrated Zonal Assistant
+                Your AI study companion
               </div>
             </div>
           </div>

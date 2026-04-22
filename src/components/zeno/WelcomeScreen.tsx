@@ -37,10 +37,10 @@ export function WelcomeScreen({ name, onPrompt }: Props) {
         <Sparkles className="w-8 h-8 text-white" />
       </div>
       <h1 className="font-space text-3xl md:text-4xl font-bold text-gray-900 dark:text-white tracking-tight text-center">
-        Hi {firstName}, I'm <span className="text-accent-600 dark:text-accent-400">LIZA</span>
+        Hi {firstName}, I'm <span className="text-accent-600 dark:text-accent-400">Zeno</span>
       </h1>
       <p className="mt-2 text-center text-gray-600 dark:text-gray-400 text-[15px]">
-        Your Learning Integrated Zonal Assistant. I know your skills and I'm here to help you grow.
+        Your AI study companion. I know your skills and I'm here to help you grow.
       </p>
       <div className="grid sm:grid-cols-2 gap-3 mt-8 w-full">
         {SUGGESTIONS.map((s) => {

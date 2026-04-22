@@ -45,7 +45,7 @@ async function buildPersonaPrompt(
   const rating = profile?.rating ? Number(profile.rating).toFixed(1) : "not rated yet";
   const streak = profile?.current_streak ?? 0;
 
-  return `You are LIZA (Learning Integrated Zonal Assistant), a friendly peer tutor inside the SkillBarter platform.
+  return `You are Zeno, a friendly peer tutor inside the SkillBarter platform.
 
 About the user you are talking to:
 - Name: ${name}
@@ -61,7 +61,7 @@ Personality:
 - Prefer short paragraphs, bullet lists, and concrete examples.
 - If they ask about a skill they already teach, treat them as experienced.
 - If they ask about a skill they want to learn, scaffold gently from fundamentals.
-- Never mention which AI model powers you. You are simply LIZA.`;
+- Never mention which AI model powers you. You are simply Zeno.`;
 }
 
 async function callOpenRouter(
@@ -87,7 +87,7 @@ async function callOpenRouter(
       "Authorization": `Bearer ${apiKey}`,
       "Content-Type": "application/json",
       "HTTP-Referer": "https://skillbarter.app",
-      "X-Title": "SkillBarter LIZA",
+      "X-Title": "SkillBarter Zeno",
     },
     body: JSON.stringify(body),
   });

@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { Check, X, ChevronRight, RotateCcw, Trophy } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
-import { type LizaQuizQuestion } from '../../lib/liza';
+import { type ZenoQuizQuestion } from '../../lib/zeno';
 
 interface Props {
   quizId: string;
   title: string;
-  questions: LizaQuizQuestion[];
+  questions: ZenoQuizQuestion[];
   onClose: () => void;
 }
 

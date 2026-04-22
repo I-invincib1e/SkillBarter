@@ -32,9 +32,9 @@
 
 **SkillBarter** is a peer-to-peer student skill exchange platform that enables university students to offer and request help from peers using a credit-based currency system. The platform eliminates monetary transactions by using "Time Credits" as a medium of exchange, making skill-sharing accessible to all students regardless of financial status.
 
-**Project Status**: Production-ready with atomic server-side operations, comprehensive database constraints, full accessibility support, and an integrated AI tutor (LIZA)
+**Project Status**: Production-ready with atomic server-side operations, comprehensive database constraints, full accessibility support, and an integrated AI tutor (Zeno)
 **Total Codebase**: ~9,500+ lines of TypeScript/React + PostgreSQL functions + Supabase Edge Function
-**Database**: Supabase PostgreSQL with 11 core tables plus 7 LIZA AI tables, 5 atomic RPC functions, 6 CHECK constraints, composite indexes
+**Database**: Supabase PostgreSQL with 11 core tables plus 7 Zeno AI tables, 5 atomic RPC functions, 6 CHECK constraints, composite indexes
 **Edge Functions**: 1 Deno-based function (`liza-ai`) proxying chat, flashcard, and quiz generation to free models on OpenRouter
 **Migrations**: 12 migration files tracking complete schema evolution
 **Team Size**: 4 developers with specialized roles
@@ -68,7 +68,7 @@ SkillBarter provides a decentralized platform where:
 4. **Trackable Progress** - Fully functional badge auto-awards, streaks with grace period, and auto-calculated ratings
 5. **Flexible Scheduling** - Online and offline session options with date/time pickers
 6. **Accessible** - WCAG-compliant with ARIA landmarks, keyboard navigation, reduced-motion support, and mobile-optimized navigation
-7. **AI Tutor On Demand** - LIZA, a personalized AI assistant integrated into the platform, generates flashcards and MCQ quizzes from prompts, PDFs, or ongoing conversations, and answers study questions using the user's profile context
+7. **AI Tutor On Demand** - Zeno, a personalized AI assistant integrated into the platform, generates flashcards and MCQ quizzes from prompts, PDFs, or ongoing conversations, and answers study questions using the user's profile context
 
 ### Target Users
 
@@ -254,7 +254,7 @@ SkillBarter provides a decentralized platform where:
 - Tailwind CSS v3.4 for styling
 - Lucide React for icons
 - Vite v5.4 as build tool
-- pdfjs-dist for client-side PDF text extraction (LIZA file uploads)
+- pdfjs-dist for client-side PDF text extraction (Zeno file uploads)
 
 **Backend:**
 - Supabase (PostgreSQL database)
@@ -793,7 +793,7 @@ Security:
 - RLS: Authenticated INSERT (system records transactions)
 ```
 
-#### 12. **liza_conversations, liza_messages, liza_flashcard_sets, liza_flashcards, liza_quizzes, liza_quiz_questions, liza_quiz_attempts** (LIZA AI Tutor)
+#### 12. **liza_conversations, liza_messages, liza_flashcard_sets, liza_flashcards, liza_quizzes, liza_quiz_questions, liza_quiz_attempts** (Zeno AI Tutor)
 
 ```
 liza_conversations
@@ -857,7 +857,7 @@ Indexes:
 - (user_id, completed_at DESC) on quiz_attempts
 
 Security:
-- RLS enabled on all 7 LIZA tables
+- RLS enabled on all 7 Zeno tables
 - Owner-only SELECT/INSERT/UPDATE/DELETE via auth.uid() = user_id
 - Nested tables (messages, flashcards, quiz_questions) enforce ownership through EXISTS subqueries on the parent row
 ```
@@ -1665,8 +1665,8 @@ Toast: "Request accepted! Session scheduled."
 - **Persistent**: Theme preference saved locally
 - **System Match**: Respects system theme preference
 
-#### 13. LIZA -- AI Learning Assistant
-- **Personalized Chat**: Streaming conversational AI that uses the user's profile (name, skills offered, skills wanted, sessions, rating, streak) as live system context on every request. No model or vendor name is exposed in the UI -- the assistant presents simply as LIZA.
+#### 13. Zeno -- AI Learning Assistant
+- **Personalized Chat**: Streaming conversational AI that uses the user's profile (name, skills offered, skills wanted, sessions, rating, streak) as live system context on every request. No model or vendor name is exposed in the UI -- the assistant presents simply as Zeno.
 - **Conversation History**: Chats persist in Supabase and are grouped by Today / This Week / Older in a left sidebar. Users can create, select, and delete conversations; auto-generated titles are produced server-side after the first reply.
 - **Flashcard Generation**: Generates 3-20 flip-card decks from three sources -- a user-written prompt, an uploaded PDF/TXT (up to 2 MB, parsed client-side via pdfjs-dist), or the current chat context. Cards store `front`, `back`, and position in `liza_flashcards`.
 - **Flashcard Viewer**: Modal with flip animation, progress bar, prev/next navigation, shuffle, and restart controls.
@@ -1674,7 +1674,7 @@ Toast: "Request accepted! Session scheduled."
 - **Quiz Runner**: One-question-at-a-time UI with A-D options, progress bar, disabled-Next until selection, and a final results screen showing every correct answer with its explanation. Attempts are stored in `liza_quiz_attempts` with score, total, and the user's answer array.
 - **File Upload Pipeline**: Files validated to ≤ 2 MB client-side. PDFs are extracted in-browser using `pdfjs-dist` with its worker loaded via a Vite `?url` import. Text is truncated to 30,000 characters before transmission to keep Edge Function payloads small.
 - **Server-Side AI Proxy**: A single Supabase Edge Function (`liza-ai`) handles three actions (`chat`, `generate_flashcards`, `generate_quiz`) using OpenRouter's fallback routing across free models (`nvidia/nemotron-3-super-120b-a12b:free` primary, `google/gemma-4-31b-it:free` fallback). The function verifies the caller's JWT, builds a persona prompt from the profile, calls OpenRouter, and either streams tokens back via Server-Sent Events (chat) or validates strict JSON output and persists to the database (flashcards/quizzes).
-- **Security**: OpenRouter API key stored as Edge Function secret (never reaches the browser). All seven LIZA tables have RLS enabled with per-user policies; nested tables (messages, flashcards, quiz questions) use EXISTS subqueries to verify ownership through the parent row.
+- **Security**: OpenRouter API key stored as Edge Function secret (never reaches the browser). All seven Zeno tables have RLS enabled with per-user policies; nested tables (messages, flashcards, quiz questions) use EXISTS subqueries to verify ownership through the parent row.
 
 ### Dashboard Features
 - **Overview Cards**: Quick stats (balance, sessions, requests)

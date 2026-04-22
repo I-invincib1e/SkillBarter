@@ -1,8 +1,8 @@
 import { supabase } from './supabase';
 
-export const LIZA_FUNCTION_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/liza-ai`;
+export const ZENO_FUNCTION_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/liza-ai`;
 
-export type LizaMessage = {
+export type ZenoMessage = {
   id: string;
   conversation_id: string;
   role: 'user' | 'assistant' | 'system';
@@ -10,7 +10,7 @@ export type LizaMessage = {
   created_at: string;
 };
 
-export type LizaConversation = {
+export type ZenoConversation = {
   id: string;
   user_id: string;
   title: string;
@@ -18,7 +18,7 @@ export type LizaConversation = {
   updated_at: string;
 };
 
-export type LizaFlashcardSet = {
+export type ZenoFlashcardSet = {
   id: string;
   user_id: string;
   conversation_id: string | null;
@@ -28,7 +28,7 @@ export type LizaFlashcardSet = {
   created_at: string;
 };
 
-export type LizaFlashcard = {
+export type ZenoFlashcard = {
   id: string;
   set_id: string;
   front: string;
@@ -36,7 +36,7 @@ export type LizaFlashcard = {
   position: number;
 };
 
-export type LizaQuiz = {
+export type ZenoQuiz = {
   id: string;
   user_id: string;
   conversation_id: string | null;
@@ -47,7 +47,7 @@ export type LizaQuiz = {
   created_at: string;
 };
 
-export type LizaQuizQuestion = {
+export type ZenoQuizQuestion = {
   id: string;
   quiz_id: string;
   question: string;
@@ -75,7 +75,7 @@ export async function streamChat(params: {
   signal?: AbortSignal;
 }): Promise<void> {
   const headers = await authHeaders();
-  const resp = await fetch(LIZA_FUNCTION_URL, {
+  const resp = await fetch(ZENO_FUNCTION_URL, {
     method: 'POST',
     headers,
     signal: params.signal,
@@ -129,9 +129,9 @@ export async function generateFlashcards(params: {
   sourceType: 'prompt' | 'pdf' | 'chat';
   sourceFilename?: string;
   conversationId?: string | null;
-}): Promise<{ set: LizaFlashcardSet; cards: LizaFlashcard[] }> {
+}): Promise<{ set: ZenoFlashcardSet; cards: ZenoFlashcard[] }> {
   const headers = await authHeaders();
-  const resp = await fetch(LIZA_FUNCTION_URL, {
+  const resp = await fetch(ZENO_FUNCTION_URL, {
     method: 'POST',
     headers,
     body: JSON.stringify({
@@ -154,9 +154,9 @@ export async function generateQuiz(params: {
   sourceType: 'prompt' | 'pdf' | 'chat';
   sourceFilename?: string;
   conversationId?: string | null;
-}): Promise<{ quiz: LizaQuiz; questions: LizaQuizQuestion[] }> {
+}): Promise<{ quiz: ZenoQuiz; questions: ZenoQuizQuestion[] }> {
   const headers = await authHeaders();
-  const resp = await fetch(LIZA_FUNCTION_URL, {
+  const resp = await fetch(ZENO_FUNCTION_URL, {
     method: 'POST',
     headers,
     body: JSON.stringify({
@@ -174,11 +174,11 @@ export async function generateQuiz(params: {
 }
 
 export function groupConversationsByTime(
-  conversations: LizaConversation[],
-): { label: string; items: LizaConversation[] }[] {
+  conversations: ZenoConversation[],
+): { label: string; items: ZenoConversation[] }[] {
   const now = Date.now();
   const day = 24 * 60 * 60 * 1000;
-  const buckets: Record<string, LizaConversation[]> = {
+  const buckets: Record<string, ZenoConversation[]> = {
     Today: [],
     'This week': [],
     Older: [],

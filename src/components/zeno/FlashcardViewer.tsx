@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight, RotateCcw, Shuffle, X } from 'lucide-react';
-import { type LizaFlashcard } from '../../lib/liza';
+import { type ZenoFlashcard } from '../../lib/zeno';
 
 interface Props {
   title: string;
-  cards: LizaFlashcard[];
+  cards: ZenoFlashcard[];
   onClose: () => void;
 }
 

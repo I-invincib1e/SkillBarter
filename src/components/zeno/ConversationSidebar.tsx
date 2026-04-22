@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 import { Plus, Trash2, MessageSquare } from 'lucide-react';
-import { type LizaConversation, groupConversationsByTime } from '../../lib/liza';
+import { type ZenoConversation, groupConversationsByTime } from '../../lib/zeno';
 
 interface Props {
-  conversations: LizaConversation[];
+  conversations: ZenoConversation[];
   activeId: string | null;
   onSelect: (id: string) => void;
   onNew: () => void;
@@ -34,7 +34,7 @@ export function ConversationSidebar({
         {conversations.length === 0 ? (
           <div className="px-3 py-8 text-center text-xs text-gray-500 dark:text-gray-400">
             <MessageSquare className="w-6 h-6 mx-auto mb-2 opacity-40" />
-            No chats yet. Start a conversation with LIZA.
+            No chats yet. Start a conversation with Zeno.
           </div>
         ) : (
           groups.map((group) => (

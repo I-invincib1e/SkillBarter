@@ -18,7 +18,7 @@ export function ChatInput({
   onClearAttachment,
   disabled,
   streaming,
-  placeholder = 'Ask LIZA anything...',
+  placeholder = 'Ask Zeno anything...',
 }: ChatInputProps) {
   const [value, setValue] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
@@ -118,7 +118,7 @@ export function ChatInput({
         </div>
       </div>
       <p className="text-[11px] text-gray-500 dark:text-gray-500 text-center mt-2">
-        LIZA learns from your SkillBarter activity. Press Enter to send, Shift+Enter for a new line.
+        Zeno learns from your SkillBarter activity. Press Enter to send, Shift+Enter for a new line.
       </p>
     </div>
   );

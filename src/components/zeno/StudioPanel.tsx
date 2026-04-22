@@ -12,9 +12,9 @@ import {
 import {
   generateFlashcards,
   generateQuiz,
-  type LizaFlashcardSet,
-  type LizaQuiz,
-} from '../../lib/liza';
+  type ZenoFlashcardSet,
+  type ZenoQuiz,
+} from '../../lib/zeno';
 import { extractFile, MAX_PDF_BYTES } from '../../lib/pdfText';
 import { supabase } from '../../lib/supabase';
 import { useToast } from '../ui/Toast';
@@ -45,8 +45,8 @@ export function StudioPanel({
   const [fileText, setFileText] = useState<string>('');
   const [extracting, setExtracting] = useState(false);
   const [generating, setGenerating] = useState(false);
-  const [recentSets, setRecentSets] = useState<LizaFlashcardSet[]>([]);
-  const [recentQuizzes, setRecentQuizzes] = useState<LizaQuiz[]>([]);
+  const [recentSets, setRecentSets] = useState<ZenoFlashcardSet[]>([]);
+  const [recentQuizzes, setRecentQuizzes] = useState<ZenoQuiz[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { showToast } = useToast();
 
@@ -61,8 +61,8 @@ export function StudioPanel({
       .select('*')
       .order('created_at', { ascending: false })
       .limit(10);
-    setRecentSets((sets as LizaFlashcardSet[]) || []);
-    setRecentQuizzes((quizzes as LizaQuiz[]) || []);
+    setRecentSets((sets as ZenoFlashcardSet[]) || []);
+    setRecentQuizzes((quizzes as ZenoQuiz[]) || []);
   };
 
   useEffect(() => {

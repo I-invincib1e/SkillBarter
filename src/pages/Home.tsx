@@ -101,9 +101,9 @@ export function Home() {
     },
     {
       icon: Sparkles,
-      title: 'Meet LIZA',
+      title: 'Meet Zeno',
       description: 'Your personal AI tutor that knows your skills. Chat, generate flashcards, and take quizzes instantly.',
-      code: 'LIZA',
+      code: 'ZENO',
       span: 'md:col-span-2',
     },
   ];
@@ -388,7 +388,7 @@ export function Home() {
         </div>
       </section>
 
-      <section id="liza" className="relative py-24 md:py-32 bg-white dark:bg-dark-bg border-y-3 border-gray-900 dark:border-white/20 overflow-hidden">
+      <section id="zeno" className="relative py-24 md:py-32 bg-white dark:bg-dark-bg border-y-3 border-gray-900 dark:border-white/20 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none opacity-40">
           <div className="absolute top-20 -left-20 w-72 h-72 bg-accent-400/20 dark:bg-accent-500/20 rounded-full blur-3xl" />
           <div className="absolute bottom-20 -right-20 w-80 h-80 bg-blue-400/20 dark:bg-blue-500/20 rounded-full blur-3xl" />
@@ -398,7 +398,7 @@ export function Home() {
           <ScrollReveal className="text-center mb-14">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-accent-50 dark:bg-accent-500/10 border-2 border-gray-900 dark:border-white/20 font-mono text-xs text-gray-600 dark:text-gray-400 mb-6">
               <Sparkles className="w-3 h-3" />
-              MEET_LIZA
+              MEET_ZENO
             </div>
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-mono font-bold text-gray-900 dark:text-white mb-4">
               Your AI Tutor Who{' '}
@@ -408,7 +408,7 @@ export function Home() {
               </span>
             </h2>
             <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto font-mono">
-              LIZA is your Learning Integrated Zonal Assistant. She reads your profile, your skills, your sessions and tutors you like a peer who has your back.
+              Zeno is your AI study companion. It reads your profile, your skills, your sessions and tutors you like a peer who has your back.
             </p>
           </ScrollReveal>
 
@@ -420,7 +420,7 @@ export function Home() {
                     <Sparkles className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <div className="font-mono font-bold text-gray-900 dark:text-white">LIZA</div>
+                    <div className="font-mono font-bold text-gray-900 dark:text-white">ZENO</div>
                     <div className="font-mono text-[10px] tracking-wider text-gray-400">ONLINE // READY_TO_HELP</div>
                   </div>
                   <div className="ml-auto flex items-center gap-1.5 font-mono text-[10px] text-accent-600 dark:text-accent-400">
@@ -496,7 +496,7 @@ export function Home() {
                 {
                   icon: FileText,
                   title: 'Upload a PDF',
-                  text: 'Drop in study material up to 2 MB. LIZA reads it and tutors from it.',
+                  text: 'Drop in study material up to 2 MB. Zeno reads it and tutors from it.',
                   tag: '04',
                 },
               ].map((item, i) => {
@@ -531,7 +531,7 @@ export function Home() {
             <Link to="/signup">
               <button className="group inline-flex items-center gap-3 px-8 py-4 bg-accent-500 text-white font-mono font-bold text-sm border-3 border-gray-900 dark:border-white/80 shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] dark:shadow-[5px_5px_0px_0px_rgba(255,255,255,0.25)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-0.5 hover:translate-y-0.5 transition-all">
                 <Sparkles className="w-4 h-4" />
-                Try LIZA Free
+                Try Zeno Free
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
             </Link>
@@ -712,7 +712,7 @@ export function Home() {
                 title: 'Product',
                 links: [
                   { label: 'Features', href: '#features' },
-                  { label: 'Meet LIZA', href: '#liza' },
+                  { label: 'Meet Zeno', href: '#zeno' },
                   { label: 'How it Works', href: '#how-it-works' },
                   { label: 'Pricing', href: '#' },
                 ],

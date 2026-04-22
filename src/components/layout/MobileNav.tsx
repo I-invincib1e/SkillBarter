@@ -23,7 +23,7 @@ const navItems = [
 ];
 
 const moreItems = [
-  { path: '/liza', icon: Sparkles, label: 'LIZA' },
+  { path: '/zeno', icon: Sparkles, label: 'Zeno' },
   { path: '/listings', icon: FileText, label: 'My Listings' },
   { path: '/requests', icon: Bell, label: 'Requests' },
   { path: '/wallet', icon: Wallet, label: 'Wallet' },
