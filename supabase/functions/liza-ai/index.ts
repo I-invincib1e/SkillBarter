@@ -7,8 +7,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
 };
 
-const PRIMARY_MODEL = "meta-llama/llama-3.3-70b-instruct:free";
-const FALLBACK_MODEL = "google/gemma-2-9b-it:free";
+const PRIMARY_MODEL = "nvidia/nemotron-3-super-120b-a12b:free";
+const FALLBACK_MODEL = "google/gemma-4-31b-it:free";
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 const MAX_SOURCE_CHARS = 30000;
 
