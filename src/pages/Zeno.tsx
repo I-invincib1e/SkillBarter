@@ -388,6 +388,3 @@ export function Zeno() {
     </div>
   );
 }
-
-
-export { Zeno }
