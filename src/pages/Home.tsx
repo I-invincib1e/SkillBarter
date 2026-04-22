@@ -13,6 +13,9 @@ import {
   MessageSquare,
   Layers,
   Sparkles,
+  BookOpen,
+  FileText,
+  Brain,
 } from 'lucide-react';
 import { useInView } from '../hooks/useInView';
 import { useCountUp } from '../hooks/useCountUp';
@@ -94,6 +97,13 @@ export function Home() {
       title: 'Achievement System',
       description: 'Complete challenges. Unlock exclusive badges. Stand out from the crowd.',
       code: 'ACHIEVE',
+      span: '',
+    },
+    {
+      icon: Sparkles,
+      title: 'Meet LIZA',
+      description: 'Your personal AI tutor that knows your skills. Chat, generate flashcards, and take quizzes instantly.',
+      code: 'LIZA',
       span: 'md:col-span-2',
     },
   ];
@@ -378,6 +388,157 @@ export function Home() {
         </div>
       </section>
 
+      <section id="liza" className="relative py-24 md:py-32 bg-white dark:bg-dark-bg border-y-3 border-gray-900 dark:border-white/20 overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none opacity-40">
+          <div className="absolute top-20 -left-20 w-72 h-72 bg-accent-400/20 dark:bg-accent-500/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 -right-20 w-80 h-80 bg-blue-400/20 dark:bg-blue-500/20 rounded-full blur-3xl" />
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
+          <ScrollReveal className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-accent-50 dark:bg-accent-500/10 border-2 border-gray-900 dark:border-white/20 font-mono text-xs text-gray-600 dark:text-gray-400 mb-6">
+              <Sparkles className="w-3 h-3" />
+              MEET_LIZA
+            </div>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-mono font-bold text-gray-900 dark:text-white mb-4">
+              Your AI Tutor Who{' '}
+              <span className="relative inline-block">
+                <span className="relative z-10">Actually Knows You</span>
+                <span className="absolute bottom-1 md:bottom-2 left-0 right-0 h-3 md:h-4 bg-accent-500/40 dark:bg-accent-400/40 -rotate-1" />
+              </span>
+            </h2>
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto font-mono">
+              LIZA is your Learning Integrated Zonal Assistant. She reads your profile, your skills, your sessions and tutors you like a peer who has your back.
+            </p>
+          </ScrollReveal>
+
+          <div className="grid lg:grid-cols-5 gap-6 items-stretch">
+            <ScrollReveal delay={1} className="lg:col-span-3">
+              <div className="relative h-full bg-white dark:bg-dark-card border-3 border-gray-900 dark:border-white/30 shadow-[8px_8px_0px_0px_rgba(16,185,129,1)] dark:shadow-[8px_8px_0px_0px_rgba(52,211,153,0.4)] p-6 md:p-8 overflow-hidden">
+                <div className="flex items-center gap-3 mb-5 pb-5 border-b-2 border-gray-200 dark:border-white/10">
+                  <div className="w-10 h-10 bg-accent-500 border-2 border-gray-900 dark:border-white/50 flex items-center justify-center">
+                    <Sparkles className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <div className="font-mono font-bold text-gray-900 dark:text-white">LIZA</div>
+                    <div className="font-mono text-[10px] tracking-wider text-gray-400">ONLINE // READY_TO_HELP</div>
+                  </div>
+                  <div className="ml-auto flex items-center gap-1.5 font-mono text-[10px] text-accent-600 dark:text-accent-400">
+                    <span className="w-1.5 h-1.5 bg-accent-500 rounded-full animate-pulse" />
+                    LIVE
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex justify-end">
+                    <div className="max-w-[80%] px-4 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-mono">
+                      Quiz me on data structures, 10 questions.
+                    </div>
+                  </div>
+                  <div className="flex">
+                    <div className="max-w-[85%] px-4 py-2.5 bg-accent-50 dark:bg-accent-500/10 border-2 border-accent-500/40 text-gray-800 dark:text-gray-100 text-sm font-mono">
+                      On it, Priya. Using what you teach plus your CS notes. Generating a 10-question MCQ set now...
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 ml-4 mt-4">
+                    <div className="flex -space-x-1.5">
+                      <div className="w-6 h-6 bg-accent-500 border-2 border-white dark:border-dark-card" />
+                      <div className="w-6 h-6 bg-blue-500 border-2 border-white dark:border-dark-card" />
+                      <div className="w-6 h-6 bg-gray-900 dark:bg-white border-2 border-white dark:border-dark-card" />
+                    </div>
+                    <span className="font-mono text-[11px] text-gray-500 dark:text-gray-400">Question 1 / 10 ready</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 mt-6 pt-5 border-t-2 border-gray-200 dark:border-white/10">
+                  {[
+                    { icon: MessageSquare, label: 'Chat' },
+                    { icon: Layers, label: 'Flashcards' },
+                    { icon: BookOpen, label: 'Quiz' },
+                  ].map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <div
+                        key={item.label}
+                        className="flex flex-col items-center gap-1.5 p-3 bg-gray-50 dark:bg-white/5 border-2 border-gray-200 dark:border-white/10"
+                      >
+                        <Icon className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                        <span className="font-mono text-[10px] font-bold text-gray-700 dark:text-gray-200">
+                          {item.label.toUpperCase()}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </ScrollReveal>
+
+            <div className="lg:col-span-2 flex flex-col gap-4">
+              {[
+                {
+                  icon: Brain,
+                  title: 'Knows your profile',
+                  text: 'Uses your skills, sessions, and goals to give advice that fits you.',
+                  tag: '01',
+                },
+                {
+                  icon: Layers,
+                  title: 'Flashcards on demand',
+                  text: 'Generate flip-card decks (3-20) from a topic, PDF, or current chat.',
+                  tag: '02',
+                },
+                {
+                  icon: BookOpen,
+                  title: 'MCQ quizzes with explanations',
+                  text: '3 to 30 questions, instant scoring, and reasoning for every answer.',
+                  tag: '03',
+                },
+                {
+                  icon: FileText,
+                  title: 'Upload a PDF',
+                  text: 'Drop in study material up to 2 MB. LIZA reads it and tutors from it.',
+                  tag: '04',
+                },
+              ].map((item, i) => {
+                const Icon = item.icon;
+                return (
+                  <ScrollReveal key={item.title} delay={Math.min(i + 1, 5)}>
+                    <div className="group p-5 bg-white dark:bg-dark-card border-3 border-gray-900 dark:border-white/30 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.1)] hover:shadow-[6px_6px_0px_0px_rgba(16,185,129,1)] dark:hover:shadow-[6px_6px_0px_0px_rgba(52,211,153,0.45)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all">
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 bg-accent-500 border-2 border-gray-900 dark:border-white/50 flex items-center justify-center shrink-0">
+                          <Icon className="w-5 h-5 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-start justify-between gap-2">
+                            <h3 className="font-mono font-bold text-gray-900 dark:text-white">
+                              {item.title}
+                            </h3>
+                            <span className="font-mono text-[10px] text-gray-400">[{item.tag}]</span>
+                          </div>
+                          <p className="text-gray-600 dark:text-gray-400 font-mono text-xs mt-1 leading-relaxed">
+                            {item.text}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </ScrollReveal>
+                );
+              })}
+            </div>
+          </div>
+
+          <ScrollReveal className="mt-10 text-center">
+            <Link to="/signup">
+              <button className="group inline-flex items-center gap-3 px-8 py-4 bg-accent-500 text-white font-mono font-bold text-sm border-3 border-gray-900 dark:border-white/80 shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] dark:shadow-[5px_5px_0px_0px_rgba(255,255,255,0.25)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-0.5 hover:translate-y-0.5 transition-all">
+                <Sparkles className="w-4 h-4" />
+                Try LIZA Free
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </button>
+            </Link>
+          </ScrollReveal>
+        </div>
+      </section>
+
       <section id="features" className="relative py-24 md:py-32 bg-white dark:bg-dark-bg border-y-3 border-gray-900 dark:border-white/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <ScrollReveal className="text-center mb-16">
@@ -551,6 +712,7 @@ export function Home() {
                 title: 'Product',
                 links: [
                   { label: 'Features', href: '#features' },
+                  { label: 'Meet LIZA', href: '#liza' },
                   { label: 'How it Works', href: '#how-it-works' },
                   { label: 'Pricing', href: '#' },
                 ],

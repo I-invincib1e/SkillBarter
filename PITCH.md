@@ -39,7 +39,7 @@ The system is a three-layer architecture:
 
 **First, the frontend** -- built with React 18 and TypeScript. It handles all the user interaction: browsing listings, booking sessions, managing wallets. Sandesh will walk you through this in detail.
 
-**Second, the Supabase backend** -- this is a managed PostgreSQL database with built-in authentication. We have 11 core tables covering profiles, wallets, listings, requests, sessions, credit locks, reviews, badges, user badges, transactions, and categories.
+**Second, the Supabase backend** -- this is a managed PostgreSQL database with built-in authentication. We have 11 core tables covering profiles, wallets, listings, requests, sessions, credit locks, reviews, badges, user badges, transactions, and categories, plus 7 tables powering LIZA -- our in-app AI tutor -- for conversations, messages, flashcard sets, flashcards, quizzes, quiz questions, and quiz attempts. LIZA runs on a single Supabase Edge Function that proxies to free models on OpenRouter, so no API keys ever touch the browser.
 
 **Third, and this is what I am most proud of -- we have 5 atomic server-side functions** that handle every credit-sensitive operation. When a student books a session, the system does not make 4 separate database calls from the browser. Instead, it makes one call to a PostgreSQL function called `book_session()`. That function locks the wallet row, validates the balance, creates the session, locks the credits, updates the wallet, and records the transaction -- all in a single database transaction. If any step fails, everything rolls back. No partial state. No lost credits.
 
@@ -53,7 +53,7 @@ We built the same pattern for session completion, cancellation, and request acce
 
 **Constraints**: We do not trust the frontend. The database itself enforces non-negative wallet balances, prevents self-booking, prevents duplicate reviews, and validates rating ranges -- all through CHECK and UNIQUE constraints. Even if someone bypasses our UI entirely and calls the API directly, the database rejects invalid operations.
 
-**11 migrations** track the complete evolution of our schema, from the initial table creation through to the final atomic functions and integrity constraints."
+**12 migrations** track the complete evolution of our schema, from the initial table creation through atomic functions and integrity constraints, and finally the LIZA AI tables with their own RLS policies."
 
 ### Closing Handoff (15 seconds)
 
@@ -83,7 +83,9 @@ We built the same pattern for session completion, cancellation, and request acce
 
 **Session Detail**: After booking, both users track the session here. The confirm button is disabled until the scheduled time plus the session duration has passed -- so a 60-minute session requires 60 minutes to elapse. Both users must confirm independently. When the second person confirms, credits transfer instantly.
 
-**Wallet**: Shows available balance, locked credits with an expandable breakdown showing which session holds each lock, and a full transaction history with Load More pagination."
+**Wallet**: Shows available balance, locked credits with an expandable breakdown showing which session holds each lock, and a full transaction history with Load More pagination.
+
+**LIZA -- AI Tutor**: This is a dedicated page inside the app. On the left is a chat history grouped by Today, This Week, and Older. In the center is the chat with streaming responses -- LIZA knows the student's name, skills, sessions, and rating because the Edge Function reads the profile before calling the model. On the right is a Studio panel with two actions: Flashcards and Quiz. A student can generate 3-20 flashcards or 3-30 MCQ questions from a prompt, an uploaded PDF up to 2 MB, or the current conversation. PDFs are parsed in the browser using pdfjs-dist so the extracted text stays under Edge Function payload limits. Flashcards open in a flip-card viewer with shuffle and restart. Quizzes open as an A-D multiple-choice runner with a results screen that shows the correct answer and an explanation for every question, and every attempt is saved to the database so students can track their progress."
 
 ### Technical Highlights (30 seconds)
 
@@ -236,7 +238,7 @@ A (Rushikesh): "Strictly, storing `rating` and `total_reviews` on the profiles t
 
 **Q: How many migrations do you have and why?**
 
-A (Rutuja): "11 migrations. Each represents a logical change to the schema. The first creates the full initial schema. Subsequent migrations fix the signup trigger, add service role policies, add review and streak triggers, optimize indexes, add foreign key constraints between tables, fix RLS policies for specific use cases, and finally add CHECK constraints and all 5 atomic functions. We follow a strict rule: never modify an existing migration file. Each migration uses `IF NOT EXISTS` and `IF EXISTS` checks so it can be safely re-run."
+A (Rutuja): "12 migrations. Each represents a logical change to the schema. The first creates the full initial schema. Subsequent migrations fix the signup trigger, add service role policies, add review and streak triggers, optimize indexes, add foreign key constraints between tables, fix RLS policies for specific use cases, add CHECK constraints and all 5 atomic functions, and finally add the 7 LIZA AI tables with their own RLS policies. We follow a strict rule: never modify an existing migration file. Each migration uses `IF NOT EXISTS` and `IF EXISTS` checks so it can be safely re-run."
 
 **Q: What is the `credit_locks` table and why do you need it?**
 
@@ -276,11 +278,35 @@ A (Pavankumar): "The most critical issue was that before we added the atomic fun
 
 ---
 
+### LIZA -- AI Tutor
+
+**Q: Why build your own AI tutor instead of pointing students at ChatGPT?**
+
+A (Rushikesh): "Generic assistants do not know the student. LIZA does. Before every response, our Edge Function pulls the user's profile from the database -- their name, skills they teach, skills they want to learn, sessions completed, and rating -- and builds a system prompt from it. So when a Computer Science student who teaches Java asks for help with recursion, LIZA knows to treat them as experienced. When the same student asks about photography, which they listed as wanting to learn, LIZA scaffolds from fundamentals. It also ties directly into the platform -- flashcards and quizzes are saved to the same Supabase database as the rest of their SkillBarter activity."
+
+**Q: How do you keep the OpenRouter API key safe?**
+
+A (Rutuja): "The key is stored as a Supabase Edge Function secret. The browser never sees it. Every LIZA request goes through our `liza-ai` Edge Function, which verifies the user's Supabase JWT, loads their profile, builds the prompt server-side, calls OpenRouter, and streams tokens back to the browser via Server-Sent Events. The client only sees the user's own JWT and the text stream. If the key ever leaks, we rotate it as a single secret update -- no code redeploy needed."
+
+**Q: What stops a user from reading someone else's flashcards or chat history?**
+
+A (Rutuja): "Row Level Security. Every LIZA table has RLS enabled with policies tied to `auth.uid()`. A user can only SELECT, INSERT, UPDATE, or DELETE rows where they are the owner. For nested tables like flashcards or quiz questions, the policy checks ownership through the parent set or quiz via an EXISTS subquery. Even if someone crafts a raw API call with another user's ID, PostgreSQL rejects the query at the row level."
+
+**Q: Why free models? Is the quality good enough?**
+
+A (Sandesh): "We use OpenRouter's fallback routing across two free models that support structured output -- Nemotron 120B as primary and Gemma 4 31B as fallback. If one hits a rate limit, OpenRouter automatically reroutes. For chat it is more than enough. For flashcards and quizzes we request strict JSON output and validate it server-side before inserting -- any malformed response is rejected with a clear error message. This also keeps our infrastructure cost at zero during the demo phase, which matters for a student-built project."
+
+**Q: How big of a PDF can LIZA handle?**
+
+A (Pavankumar): "We cap file uploads at 2 MB and truncate extracted text at 30,000 characters before sending it to the model. Text extraction happens in the browser using pdfjs-dist -- the user's machine does the heavy lifting, and only clean text crosses the network. We tested with scanned PDFs and surface a clear error explaining that scanned images are not supported. The UI shows the extracted character count in real time so students know what LIZA will actually read."
+
+---
+
 ### General / Business
 
 **Q: How is this different from existing platforms like Chegg or Wyzant?**
 
-A (Rushikesh): "Those platforms charge money. A student who cannot afford tutoring is excluded. SkillBarter uses Time Credits -- you earn them by helping others and spend them to get help. This creates a circular economy where participation is the only currency. It also encourages students to teach, which research shows deepens their own understanding of the subject."
+A (Rushikesh): "Those platforms charge money. A student who cannot afford tutoring is excluded. SkillBarter uses Time Credits -- you earn them by helping others and spend them to get help. This creates a circular economy where participation is the only currency. It also encourages students to teach, which research shows deepens their own understanding of the subject. And between sessions, LIZA -- our built-in AI tutor -- fills the gap. She generates flashcards and quizzes from a student's own material, so they can keep studying when no human tutor is online."
 
 **Q: What would you need to change for a real campus deployment?**
 

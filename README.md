@@ -19,6 +19,7 @@ SkillBarter connects students who want to learn with those who can teach. Instea
 - **Credit Wallet** - Track your balance, earnings, and spending
 - **Badges & Streaks** - Gamification to encourage participation
 - **Categories** - Browse by subject area (Programming, Math, Languages, etc.)
+- **LIZA -- AI Tutor** - Personalized assistant that chats, generates flashcards, and creates MCQ quizzes from prompts, PDFs, or the current conversation
 
 ## Tech Stack
 
@@ -27,6 +28,8 @@ SkillBarter connects students who want to learn with those who can teach. Instea
 - **Database**: Supabase (PostgreSQL)
 - **Authentication**: Supabase Auth (Email/Password + Google OAuth)
 - **Icons**: Lucide React
+- **AI**: Supabase Edge Function (`liza-ai`) proxying free OpenRouter models with streaming SSE responses
+- **PDF Parsing**: `pdfjs-dist` for in-browser text extraction (2 MB upload cap)
 
 ## Design
 
@@ -82,5 +85,11 @@ The app uses Supabase with the following main tables:
 - `badges` - Achievement definitions
 - `user_badges` - Earned badges per user
 - `categories` - Skill categories
+
+LIZA AI tutor tables:
+
+- `liza_conversations` / `liza_messages` - Chat threads and streaming messages
+- `liza_flashcard_sets` / `liza_flashcards` - Generated flip-card decks
+- `liza_quizzes` / `liza_quiz_questions` / `liza_quiz_attempts` - MCQ quizzes and scored attempts
 
 All tables use Row Level Security (RLS) for data protection.
