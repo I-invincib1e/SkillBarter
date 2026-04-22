@@ -22,6 +22,7 @@ import { Wallet } from './pages/Wallet';
 import { Badges } from './pages/Badges';
 import { Profile } from './pages/Profile';
 import { Settings } from './pages/Settings';
+import { Liza } from './pages/Liza';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -238,6 +239,16 @@ function AppRoutes() {
           <PrivateRoute>
             <Layout>
               <Settings />
+            </Layout>
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/liza"
+        element={
+          <PrivateRoute>
+            <Layout>
+              <Liza />
             </Layout>
           </PrivateRoute>
         }

@@ -12,6 +12,7 @@ import {
   Moon,
   Award,
   FileText,
+  Sparkles,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -23,6 +24,7 @@ const mainNav = [
   { path: '/listings', label: 'Listings', icon: FileText },
   { path: '/requests', label: 'Requests', icon: Bell },
   { path: '/sessions', label: 'Sessions', icon: Zap },
+  { path: '/liza', label: 'LIZA', icon: Sparkles },
 ];
 
 const bottomNav = [

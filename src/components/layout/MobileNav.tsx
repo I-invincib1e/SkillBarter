@@ -12,6 +12,7 @@ import {
   Bell,
   Settings,
   X,
+  Sparkles,
 } from 'lucide-react';
 
 const navItems = [
@@ -22,6 +23,7 @@ const navItems = [
 ];
 
 const moreItems = [
+  { path: '/liza', icon: Sparkles, label: 'LIZA' },
   { path: '/listings', icon: FileText, label: 'My Listings' },
   { path: '/requests', icon: Bell, label: 'Requests' },
   { path: '/wallet', icon: Wallet, label: 'Wallet' },
