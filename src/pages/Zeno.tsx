@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Loader2, MessageSquare, PanelRight, Sparkles } from 'lucide-react';
+import { Loader2, MessageSquare, PanelRight, Plus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../components/ui/Toast';
@@ -261,96 +261,75 @@ export function Zeno() {
     setStudioRefresh((n) => n + 1);
   };
 
-  return (
-    <div className="-mx-4 sm:-mx-6 -my-6 h-[calc(100vh-3.5rem-5rem)] md:h-[calc(100vh-1.5rem)] flex overflow-hidden">
-      <aside className="hidden lg:flex w-[260px] shrink-0 border-r border-gray-200/70 dark:border-white/10 bg-white/40 dark:bg-dark-bg/40 flex-col">
-        <ConversationSidebar
-          conversations={conversations}
-          activeId={activeId}
-          onSelect={handleSelect}
-          onNew={handleNewChat}
-          onDelete={handleDelete}
-        />
-      </aside>
+  const activeTitle = activeId
+    ? conversations.find((c) => c.id === activeId)?.title || 'Chat'
+    : 'Zeno';
 
-      <section className="flex-1 flex flex-col min-w-0 bg-gray-50/40 dark:bg-dark-bg/30">
-        <header className="flex items-center justify-between px-3 md:px-5 py-3 border-b border-gray-200/70 dark:border-white/10 bg-white/60 dark:bg-dark-bg/60 backdrop-blur-xl">
-          <div className="flex items-center gap-2 min-w-0">
-            <button
-              onClick={() => setShowConvList((s) => !s)}
-              className="lg:hidden w-9 h-9 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 flex items-center justify-center text-gray-600 dark:text-gray-300"
-              aria-label="Conversations"
-            >
-              <MessageSquare className="w-5 h-5" />
-            </button>
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-500 to-accent-400 flex items-center justify-center border-2 border-gray-900 dark:border-white/80 shrink-0">
-              <Sparkles className="w-4 h-4 text-white" />
-            </div>
-            <div className="min-w-0">
-              <div className="font-space font-bold text-sm text-gray-900 dark:text-white truncate">
-                {activeId
-                  ? conversations.find((c) => c.id === activeId)?.title || 'Chat'
-                  : 'Zeno'}
-              </div>
-              <div className="text-[10px] uppercase tracking-wider font-semibold text-gray-500 dark:text-gray-400">
-                Your AI study companion
-              </div>
-            </div>
-          </div>
+  return (
+    <div className="-mx-4 sm:-mx-6 -my-6 h-[calc(100vh-3.5rem-5rem)] md:h-[calc(100vh-1.5rem)] flex flex-col bg-white dark:bg-dark-bg">
+      <header className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-white/10">
+        <button
+          onClick={() => setShowConvList(true)}
+          className="w-9 h-9 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 flex items-center justify-center text-gray-600 dark:text-gray-300"
+          aria-label="Conversations"
+        >
+          <MessageSquare className="w-5 h-5" />
+        </button>
+        <div className="font-space font-semibold text-sm text-gray-900 dark:text-white truncate px-2">
+          {activeTitle}
+        </div>
+        <div className="flex items-center gap-1">
           <button
-            onClick={() => setShowStudio((s) => !s)}
-            className="xl:hidden w-9 h-9 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 flex items-center justify-center text-gray-600 dark:text-gray-300"
-            aria-label="Toggle studio"
+            onClick={handleNewChat}
+            className="w-9 h-9 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 flex items-center justify-center text-gray-600 dark:text-gray-300"
+            aria-label="New chat"
+          >
+            <Plus className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => setShowStudio(true)}
+            className="w-9 h-9 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 flex items-center justify-center text-gray-600 dark:text-gray-300"
+            aria-label="Studio"
           >
             <PanelRight className="w-5 h-5" />
           </button>
-        </header>
-
-        <div ref={scrollRef} className="flex-1 overflow-y-auto">
-          {loadingMessages ? (
-            <div className="h-full flex items-center justify-center">
-              <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
-            </div>
-          ) : messages.length === 0 ? (
-            <WelcomeScreen name={profile?.name} onPrompt={handleSend} />
-          ) : (
-            <div className="max-w-3xl mx-auto px-3 md:px-5 py-5 space-y-4">
-              {messages.map((m) => (
-                <ChatMessage
-                  key={m.id}
-                  role={m.role}
-                  content={m.content}
-                  streaming={m.streaming}
-                />
-              ))}
-            </div>
-          )}
         </div>
+      </header>
 
-        <div className="max-w-3xl mx-auto w-full">
-          <ChatInput
-            onSend={handleSend}
-            onAttach={handleAttach}
-            attachedFileName={attachedFile?.name || null}
-            onClearAttachment={handleClearAttachment}
-            streaming={streaming}
-            disabled={streaming}
-          />
-        </div>
-      </section>
+      <div ref={scrollRef} className="flex-1 overflow-y-auto">
+        {loadingMessages ? (
+          <div className="h-full flex items-center justify-center">
+            <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+          </div>
+        ) : messages.length === 0 ? (
+          <WelcomeScreen name={profile?.name} onPrompt={handleSend} />
+        ) : (
+          <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
+            {messages.map((m) => (
+              <ChatMessage
+                key={m.id}
+                role={m.role}
+                content={m.content}
+                streaming={m.streaming}
+              />
+            ))}
+          </div>
+        )}
+      </div>
 
-      <aside className="hidden xl:flex w-[320px] shrink-0 border-l border-gray-200/70 dark:border-white/10 bg-white/40 dark:bg-dark-bg/40 flex-col">
-        <StudioPanel
-          conversationId={activeId}
-          chatContext={chatContext}
-          onOpenFlashcards={handleOpenFlashcards}
-          onOpenQuiz={handleOpenQuiz}
-          refreshKey={studioRefresh}
+      <div className="max-w-2xl mx-auto w-full">
+        <ChatInput
+          onSend={handleSend}
+          onAttach={handleAttach}
+          attachedFileName={attachedFile?.name || null}
+          onClearAttachment={handleClearAttachment}
+          streaming={streaming}
+          disabled={streaming}
         />
-      </aside>
+      </div>
 
       {showConvList && (
-        <div className="lg:hidden fixed inset-0 z-40">
+        <div className="fixed inset-0 z-40">
           <div
             className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fade-in"
             onClick={() => setShowConvList(false)}
@@ -368,7 +347,7 @@ export function Zeno() {
       )}
 
       {showStudio && (
-        <div className="xl:hidden fixed inset-0 z-40">
+        <div className="fixed inset-0 z-40">
           <div
             className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fade-in"
             onClick={() => setShowStudio(false)}
@@ -409,3 +388,6 @@ export function Zeno() {
     </div>
   );
 }
+
+
+export { Zeno }
