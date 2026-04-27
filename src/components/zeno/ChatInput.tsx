@@ -53,11 +53,11 @@ export function ChatInput({
   };
 
   return (
-    <div className="p-3 md:p-4">
-      <div className="glass rounded-2xl border-2 border-gray-900 dark:border-white/80 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.25)] focus-within:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:focus-within:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.35)] focus-within:translate-x-0.5 focus-within:translate-y-0.5 transition-all">
+    <div className="px-3 md:px-4 pb-3 md:pb-4 pt-2">
+      <div className="rounded-3xl bg-gray-100 dark:bg-white/5">
         {attachedFileName && (
-          <div className="flex items-center gap-2 px-3 pt-3">
-            <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-accent-500/10 border border-accent-500/30 text-accent-700 dark:text-accent-300 text-xs font-medium max-w-full">
+          <div className="flex items-center gap-2 px-4 pt-3">
+            <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-white dark:bg-white/10 text-gray-700 dark:text-gray-200 text-xs font-medium max-w-full">
               <FileText className="w-3.5 h-3.5 shrink-0" />
               <span className="truncate">{attachedFileName}</span>
               <button
@@ -71,7 +71,7 @@ export function ChatInput({
             </div>
           </div>
         )}
-        <div className="flex items-end gap-2 p-2">
+        <div className="flex items-end gap-1 p-2">
           {onAttach && (
             <>
               <input
@@ -86,7 +86,7 @@ export function ChatInput({
                 onClick={() => fileRef.current?.click()}
                 disabled={disabled}
                 aria-label="Attach file"
-                className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors disabled:opacity-40"
+                className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors disabled:opacity-40"
               >
                 <Paperclip className="w-5 h-5" />
               </button>
@@ -107,18 +107,18 @@ export function ChatInput({
             onClick={handleSubmit}
             disabled={disabled || !value.trim()}
             aria-label="Send message"
-            className="shrink-0 w-10 h-10 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed hover:scale-105 active:scale-95 transition-transform"
+            className="shrink-0 w-9 h-9 rounded-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
           >
             {streaming ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
+              <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
-              <ArrowUp className="w-5 h-5" strokeWidth={2.5} />
+              <ArrowUp className="w-4 h-4" strokeWidth={2.5} />
             )}
           </button>
         </div>
       </div>
-      <p className="text-[11px] text-gray-500 dark:text-gray-500 text-center mt-2">
-        Zeno learns from your SkillBarter activity. Press Enter to send, Shift+Enter for a new line.
+      <p className="text-[11px] text-gray-400 dark:text-gray-500 text-center mt-2">
+        Zeno can make mistakes. Press Enter to send, Shift+Enter for new line.
       </p>
     </div>
   );

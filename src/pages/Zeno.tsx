@@ -267,7 +267,7 @@ export function Zeno() {
 
   return (
     <div className="-mx-4 sm:-mx-6 -my-6 h-[calc(100vh-3.5rem-5rem)] md:h-[calc(100vh-1.5rem)] flex flex-col bg-white dark:bg-dark-bg">
-      <header className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-white/10">
+      <header className="flex items-center justify-between px-4 py-3">
         <button
           onClick={() => setShowConvList(true)}
           className="w-9 h-9 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 flex items-center justify-center text-gray-600 dark:text-gray-300"
@@ -304,7 +304,7 @@ export function Zeno() {
         ) : messages.length === 0 ? (
           <WelcomeScreen name={profile?.name} onPrompt={handleSend} />
         ) : (
-          <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
+          <div className="max-w-3xl mx-auto px-4 py-6 divide-y divide-transparent">
             {messages.map((m) => (
               <ChatMessage
                 key={m.id}
@@ -317,7 +317,7 @@ export function Zeno() {
         )}
       </div>
 
-      <div className="max-w-2xl mx-auto w-full">
+      <div className="max-w-3xl mx-auto w-full">
         <ChatInput
           onSend={handleSend}
           onAttach={handleAttach}
@@ -334,7 +334,7 @@ export function Zeno() {
             className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fade-in"
             onClick={() => setShowConvList(false)}
           />
-          <div className="absolute left-0 top-0 bottom-0 w-[280px] bg-white dark:bg-dark-bg border-r-3 border-gray-900 dark:border-white/60 animate-slide-in-right">
+          <div className="absolute left-0 top-0 bottom-0 w-[280px] bg-white dark:bg-dark-bg shadow-xl animate-slide-in-right">
             <ConversationSidebar
               conversations={conversations}
               activeId={activeId}
@@ -352,7 +352,7 @@ export function Zeno() {
             className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fade-in"
             onClick={() => setShowStudio(false)}
           />
-          <div className="absolute right-0 top-0 bottom-0 w-[320px] max-w-[88vw] bg-white dark:bg-dark-bg border-l-3 border-gray-900 dark:border-white/60">
+          <div className="absolute right-0 top-0 bottom-0 w-[320px] max-w-[88vw] bg-white dark:bg-dark-bg shadow-xl">
             <StudioPanel
               conversationId={activeId}
               chatContext={chatContext}
