@@ -103,48 +103,45 @@ I will hand off to Rutuja who will explain how we protect all this data."
 
 ## 3. Rutuja -- Backend & Database Administrator
 
-### Opening (15 seconds)
+### Opening (10 seconds)
 
-"Thank you, Sandesh. My responsibility was making sure that every piece of data in this system is secure, consistent, and impossible to corrupt -- even if someone tries deliberately."
+"Thank you, Sandesh. My job was to keep all the data in this app safe -- so credits, sessions, and reviews can never get lost or faked."
 
-### Authentication & RLS (1 minute)
+### Login & Access Rules (45 seconds)
 
-"We use Supabase Authentication with email and password. When a user signs up, Supabase creates a record in `auth.users`, and our trigger automatically creates their profile, wallet, and welcome transaction.
+"We use Supabase for login with email and password. When a student signs up, the database automatically creates their profile, wallet, and 10 welcome credits.
 
-Every single table in our database has Row Level Security enabled. This means by default, nobody can read or write anything. We then add specific policies:
+Every table has a rule called Row Level Security. By default, nobody can read or change anything. Then we add small rules for who is allowed:
 
-- **Profiles**: Anyone can view profiles, but you can only edit your own.
-- **Wallets**: You can only see and modify your own wallet. Nobody else can see your balance.
-- **Sessions**: Only the two participants can see a session. Nobody else even knows it exists.
-- **Transactions**: Only visible to the user they belong to.
+- **Profile**: anyone can view, only you can edit yours.
+- **Wallet**: only you can see your balance.
+- **Session**: only the two people in it can see it.
+- **Transactions**: only visible to the owner.
 
-We have over 20 RLS policies across 11 tables. The key principle is: default deny, then explicitly allow only what is needed."
+So even if someone tries the API directly, the database blocks them."
 
-### Atomic Operations & Data Integrity (1 minute 15 seconds)
+### Safe Credit Operations (1 minute)
 
-"The most important thing I worked on was making credit operations bulletproof.
+"The biggest thing I worked on was making credits safe.
 
-Consider what happens when a session completes. We need to: mark the session complete, deduct credits from the requester's wallet, add credits to the provider's wallet, update the credit lock status, create two transaction records, update the provider's session count, recalculate their streak, and check if they earned any badges. That is 9 or more operations.
+When a session is completed, the system has to do many things at once -- mark it complete, take credits from one wallet, give them to the other, update the lock, save two transactions, and check for badges.
 
-If we did these as separate calls from the browser and the internet dropped halfway through, credits could vanish. The requester loses credits, the provider never receives them. This is not hypothetical -- on university WiFi, this would happen.
+If we did all this from the browser and the WiFi dropped halfway, credits could disappear. So I moved everything into one database function called `complete_session()`. It runs as a single transaction -- either all steps work, or none do. Nothing is half-done.
 
-So we moved all of this into a single PostgreSQL function called `complete_session()`. It runs inside one database transaction. It uses `SELECT ... FOR UPDATE` to lock the wallet rows so no concurrent operation can interfere. If any step fails -- for example, if a CHECK constraint rejects a negative balance -- PostgreSQL automatically rolls back every change. Nothing is half-done.
+We have 5 such functions: `book_session`, `complete_session`, `cancel_session`, `accept_request`, and `award_badges`. The frontend makes just one call.
 
-We built 5 of these atomic functions: `book_session`, `complete_session`, `cancel_session`, `accept_request`, and `award_badges`. The frontend makes one RPC call. The database handles the complexity.
+I also added simple safety rules in the database:
+- Wallet cannot go below zero
+- You cannot book your own listing
+- You cannot review the same session twice
 
-On top of this, we added CHECK constraints directly on the tables:
-- Wallet balance cannot go negative
-- Locked credits cannot go negative
-- You cannot book a session with yourself
-- You cannot submit duplicate reviews for the same session
+Even if the app has a bug, the database itself stops bad data."
 
-These constraints are the last line of defense. Even if our application code had a bug, the database would reject the invalid operation."
+### Indexes (20 seconds)
 
-### Indexing (30 seconds)
+"For speed, I added indexes on the columns we search most -- like sessions by provider and status. This keeps the app fast even as data grows.
 
-"For performance, we added composite indexes on the columns that are queried together most often. For example, `sessions(provider_id, status)` lets the database efficiently find all of a provider's pending sessions without scanning the entire table. We have similar composite indexes on `credit_locks(session_id, status)` and `reviews(session_id, reviewer_id)`.
-
-Pavankumar will now cover how we validated all of this through testing."
+Pavankumar will now talk about how we tested all of this."
 
 ---
 
