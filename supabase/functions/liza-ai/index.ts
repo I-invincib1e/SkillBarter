@@ -7,8 +7,13 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
 };
 
-const PRIMARY_MODEL = "meta-llama/llama-3.3-70b-instruct:free";
-const FALLBACK_MODEL = "google/gemini-2.0-flash-exp:free";
+const FREE_MODELS = [
+  "google/gemini-2.0-flash-exp:free",
+  "meta-llama/llama-3.3-70b-instruct:free",
+  "deepseek/deepseek-chat-v3-0324:free",
+  "mistralai/mistral-small-3.2-24b-instruct:free",
+  "qwen/qwen-2.5-72b-instruct:free",
+];
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 const MAX_SOURCE_CHARS = 30000;
 
@@ -69,28 +74,39 @@ async function callOpenRouter(
   messages: ChatMessage[],
   opts: { stream?: boolean; temperature?: number; responseFormat?: "json" } = {},
 ): Promise<Response> {
-  const body: Record<string, unknown> = {
-    model: PRIMARY_MODEL,
-    messages,
-    stream: opts.stream ?? false,
-    temperature: opts.temperature ?? 0.7,
-    models: [PRIMARY_MODEL, FALLBACK_MODEL],
-    route: "fallback",
-  };
-  if (opts.responseFormat === "json") {
-    body.response_format = { type: "json_object" };
-  }
+  let lastResp: Response | null = null;
+  let lastErrText = "";
+  for (const model of FREE_MODELS) {
+    const body: Record<string, unknown> = {
+      model,
+      messages,
+      stream: opts.stream ?? false,
+      temperature: opts.temperature ?? 0.7,
+    };
+    if (opts.responseFormat === "json") {
+      body.response_format = { type: "json_object" };
+    }
 
-  return await fetch(OPENROUTER_URL, {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-      "HTTP-Referer": "https://skillbarter.app",
-      "X-Title": "SkillBarter Zeno",
-    },
-    body: JSON.stringify(body),
-  });
+    const resp = await fetch(OPENROUTER_URL, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://skillbarter.app",
+        "X-Title": "SkillBarter Zeno",
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (resp.ok) return resp;
+
+    lastResp = resp;
+    lastErrText = await resp.clone().text().catch(() => "");
+    if (resp.status !== 429 && resp.status !== 503 && resp.status !== 502) {
+      return resp;
+    }
+  }
+  return lastResp ?? new Response(lastErrText || "All models failed", { status: 503 });
 }
 
 async function completeText(
