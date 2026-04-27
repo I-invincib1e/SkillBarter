@@ -39,7 +39,7 @@ The system is a three-layer architecture:
 
 **First, the frontend** -- built with React 18 and TypeScript. It handles all the user interaction: browsing listings, booking sessions, managing wallets. Sandesh will walk you through this in detail.
 
-**Second, the Supabase backend** -- this is a managed PostgreSQL database with built-in authentication. We have 11 core tables covering profiles, wallets, listings, requests, sessions, credit locks, reviews, badges, user badges, transactions, and categories, plus 7 tables powering Zeno -- our in-app AI tutor -- for conversations, messages, flashcard sets, flashcards, quizzes, quiz questions, and quiz attempts. Zeno runs on a single Supabase Edge Function that proxies to free models on OpenRouter, so no API keys ever touch the browser.
+**Second, the Supabase backend** -- this is a managed PostgreSQL database with built-in authentication. We have 11 core tables covering profiles, wallets, listings, requests, sessions, credit locks, reviews, badges, user badges, transactions, and categories, plus 7 tables powering Zeno -- our in-app AI tutor -- for conversations, messages, flashcard sets, flashcards, quizzes, quiz questions, and quiz attempts. Zeno runs on a single Supabase Edge Function that proxies to free models on Groq -- including `groq/compound` which can browse the internet for fresh information -- so no API keys ever touch the browser.
 
 **Third, and this is what I am most proud of -- we have 5 atomic server-side functions** that handle every credit-sensitive operation. When a student books a session, the system does not make 4 separate database calls from the browser. Instead, it makes one call to a PostgreSQL function called `book_session()`. That function locks the wallet row, validates the balance, creates the session, locks the credits, updates the wallet, and records the transaction -- all in a single database transaction. If any step fails, everything rolls back. No partial state. No lost credits.
 
@@ -276,9 +276,9 @@ A (Pavankumar): "The most critical issue was that before we added the atomic fun
 
 A (Rushikesh): "Generic assistants do not know the student. Zeno does. Before every response, our Edge Function pulls the user's profile from the database -- their name, skills they teach, skills they want to learn, sessions completed, and rating -- and builds a system prompt from it. So when a Computer Science student who teaches Java asks for help with recursion, Zeno knows to treat them as experienced. When the same student asks about photography, which they listed as wanting to learn, Zeno scaffolds from fundamentals. It also ties directly into the platform -- flashcards and quizzes are saved to the same Supabase database as the rest of their SkillBarter activity."
 
-**Q: How do you keep the OpenRouter API key safe?**
+**Q: How do you keep the Groq API key safe?**
 
-A (Rutuja): "The key is stored as a Supabase Edge Function secret. The browser never sees it. Every Zeno request goes through our `liza-ai` Edge Function, which verifies the user's Supabase JWT, loads their profile, builds the prompt server-side, calls OpenRouter, and streams tokens back to the browser via Server-Sent Events. The client only sees the user's own JWT and the text stream. If the key ever leaks, we rotate it as a single secret update -- no code redeploy needed."
+A (Rutuja): "The key is stored as a Supabase Edge Function secret. The browser never sees it. Every Zeno request goes through our `liza-ai` Edge Function, which verifies the user's Supabase JWT, loads their profile, builds the prompt server-side, calls Groq, and streams tokens back to the browser via Server-Sent Events. The client only sees the user's own JWT and the text stream. If the key ever leaks, we rotate it as a single secret update -- no code redeploy needed."
 
 **Q: What stops a user from reading someone else's flashcards or chat history?**
 
@@ -286,7 +286,7 @@ A (Rutuja): "Row Level Security. Every Zeno table has RLS enabled with policies 
 
 **Q: Why free models? Is the quality good enough?**
 
-A (Sandesh): "We use OpenRouter's fallback routing across two free models that support structured output -- Nemotron 120B as primary and Gemma 4 31B as fallback. If one hits a rate limit, OpenRouter automatically reroutes. For chat it is more than enough. For flashcards and quizzes we request strict JSON output and validate it server-side before inserting -- any malformed response is rejected with a clear error message. This also keeps our infrastructure cost at zero during the demo phase, which matters for a student-built project."
+A (Sandesh): "We use Groq's free tier with sequential fallback across multiple state-of-the-art models -- `groq/compound` as primary, which can actually browse the internet during a response, then `gpt-oss-120b`, Kimi K2, Llama 3.3 70B, and smaller fast models as backups. If one hits a rate limit, our Edge Function automatically retries on the next model. Groq's inference is fast enough that chat feels instant. For flashcards and quizzes we request strict JSON output and validate it server-side before inserting -- any malformed response is rejected with a clear error message. This also keeps our infrastructure cost at zero during the demo phase, which matters for a student-built project."
 
 **Q: How big of a PDF can Zeno handle?**
 

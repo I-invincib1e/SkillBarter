@@ -7,19 +7,17 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
 };
 
-const FREE_MODELS = [
-  "minimax/minimax-m2.5:free",
-  "openai/gpt-oss-120b:free",
-  "z-ai/glm-4.5-air:free",
-  "nvidia/nemotron-3-nano-30b-a3b:free",
-  "google/gemma-4-31b-it:free",
-  "qwen/qwen3-next-80b-a3b-instruct:free",
-  "openai/gpt-oss-20b:free",
-  "nvidia/nemotron-nano-9b-v2:free",
-  "meta-llama/llama-3.3-70b-instruct:free",
-  "google/gemini-2.0-flash-exp:free",
+const GROQ_MODELS = [
+  "groq/compound",
+  "openai/gpt-oss-120b",
+  "moonshotai/kimi-k2-instruct",
+  "llama-3.3-70b-versatile",
+  "openai/gpt-oss-20b",
+  "meta-llama/llama-4-maverick-17b-128e-instruct",
+  "meta-llama/llama-4-scout-17b-16e-instruct",
+  "llama-3.1-8b-instant",
 ];
-const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
+const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 const MAX_SOURCE_CHARS = 30000;
 
 type Role = "system" | "user" | "assistant";
@@ -74,14 +72,14 @@ Personality:
 - Never mention which AI model powers you. You are simply Zeno.`;
 }
 
-async function callOpenRouter(
+async function callGroq(
   apiKey: string,
   messages: ChatMessage[],
   opts: { stream?: boolean; temperature?: number; responseFormat?: "json" } = {},
 ): Promise<Response> {
   let lastResp: Response | null = null;
   let lastErrText = "";
-  for (const model of FREE_MODELS) {
+  for (const model of GROQ_MODELS) {
     const body: Record<string, unknown> = {
       model,
       messages,
@@ -92,13 +90,11 @@ async function callOpenRouter(
       body.response_format = { type: "json_object" };
     }
 
-    const resp = await fetch(OPENROUTER_URL, {
+    const resp = await fetch(GROQ_URL, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${apiKey}`,
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://skillbarter.app",
-        "X-Title": "SkillBarter Zeno",
       },
       body: JSON.stringify(body),
     });
@@ -119,10 +115,10 @@ async function completeText(
   messages: ChatMessage[],
   opts: { temperature?: number; responseFormat?: "json" } = {},
 ): Promise<string> {
-  const resp = await callOpenRouter(apiKey, messages, { ...opts, stream: false });
+  const resp = await callGroq(apiKey, messages, { ...opts, stream: false });
   if (!resp.ok) {
     const t = await resp.text();
-    throw new Error(`OpenRouter error ${resp.status}: ${t.slice(0, 300)}`);
+    throw new Error(`Groq error ${resp.status}: ${t.slice(0, 300)}`);
   }
   const data = await resp.json();
   return data?.choices?.[0]?.message?.content ?? "";
@@ -206,7 +202,7 @@ async function handleChat(
     { role: "user", content: message },
   ];
 
-  const upstream = await callOpenRouter(apiKey, messages, { stream: true });
+  const upstream = await callGroq(apiKey, messages, { stream: true });
   if (!upstream.ok || !upstream.body) {
     const t = await upstream.text();
     return errorResponse(`Model error: ${t.slice(0, 200)}`, 502);
@@ -519,9 +515,9 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const apiKey = Deno.env.get("OPENROUTER_API_KEY");
+    const apiKey = Deno.env.get("GROQ_API_KEY");
     if (!apiKey) {
-      return errorResponse("OPENROUTER_API_KEY is not configured on the server", 500);
+      return errorResponse("GROQ_API_KEY is not configured on the server", 500);
     }
 
     const authHeader = req.headers.get("Authorization") || "";

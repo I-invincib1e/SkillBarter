@@ -35,7 +35,7 @@
 **Project Status**: Production-ready with atomic server-side operations, comprehensive database constraints, full accessibility support, and an integrated AI tutor (Zeno)
 **Total Codebase**: ~9,500+ lines of TypeScript/React + PostgreSQL functions + Supabase Edge Function
 **Database**: Supabase PostgreSQL with 11 core tables plus 7 Zeno AI tables, 5 atomic RPC functions, 6 CHECK constraints, composite indexes
-**Edge Functions**: 1 Deno-based function (`liza-ai`) proxying chat, flashcard, and quiz generation to free models on OpenRouter
+**Edge Functions**: 1 Deno-based function (`liza-ai`) proxying chat, flashcard, and quiz generation to free models on Groq
 **Migrations**: 12 migration files tracking complete schema evolution
 **Team Size**: 4 developers with specialized roles
 
@@ -264,7 +264,7 @@ SkillBarter provides a decentralized platform where:
 - Supabase Edge Functions (Deno runtime) -- `liza-ai` function proxies chat and study-material generation
 
 **AI:**
-- OpenRouter API (fallback-routed across free models: `nvidia/nemotron-3-super-120b-a12b:free` primary, `google/gemma-4-31b-it:free` fallback)
+- Groq API (fallback-routed across free models: `groq/compound` primary with internet-capable search, `openai/gpt-oss-120b` and `moonshotai/kimi-k2-instruct` as high-quality fallbacks, `llama-3.3-70b-versatile` and `llama-3.1-8b-instant` as low-latency backups)
 - Server-Sent Events for streaming chat tokens
 - Strict JSON response format for structured flashcard and quiz output
 
@@ -1673,8 +1673,8 @@ Toast: "Request accepted! Session scheduled."
 - **Quiz Generation**: Generates 3-30 multiple-choice questions with exactly 4 options, a correct index, and a written explanation per question. Same three source modes as flashcards.
 - **Quiz Runner**: One-question-at-a-time UI with A-D options, progress bar, disabled-Next until selection, and a final results screen showing every correct answer with its explanation. Attempts are stored in `liza_quiz_attempts` with score, total, and the user's answer array.
 - **File Upload Pipeline**: Files validated to ≤ 2 MB client-side. PDFs are extracted in-browser using `pdfjs-dist` with its worker loaded via a Vite `?url` import. Text is truncated to 30,000 characters before transmission to keep Edge Function payloads small.
-- **Server-Side AI Proxy**: A single Supabase Edge Function (`liza-ai`) handles three actions (`chat`, `generate_flashcards`, `generate_quiz`) using OpenRouter's fallback routing across free models (`nvidia/nemotron-3-super-120b-a12b:free` primary, `google/gemma-4-31b-it:free` fallback). The function verifies the caller's JWT, builds a persona prompt from the profile, calls OpenRouter, and either streams tokens back via Server-Sent Events (chat) or validates strict JSON output and persists to the database (flashcards/quizzes).
-- **Security**: OpenRouter API key stored as Edge Function secret (never reaches the browser). All seven Zeno tables have RLS enabled with per-user policies; nested tables (messages, flashcards, quiz questions) use EXISTS subqueries to verify ownership through the parent row.
+- **Server-Side AI Proxy**: A single Supabase Edge Function (`liza-ai`) handles three actions (`chat`, `generate_flashcards`, `generate_quiz`) using Groq's OpenAI-compatible API with sequential model fallback (`groq/compound` primary with built-in web browsing, then `openai/gpt-oss-120b`, `moonshotai/kimi-k2-instruct`, `llama-3.3-70b-versatile`, and smaller fast models as backups). The function verifies the caller's JWT, builds a persona prompt from the profile, calls Groq, and either streams tokens back via Server-Sent Events (chat) or validates strict JSON output and persists to the database (flashcards/quizzes).
+- **Security**: Groq API key stored as Edge Function secret (never reaches the browser). All seven Zeno tables have RLS enabled with per-user policies; nested tables (messages, flashcards, quiz questions) use EXISTS subqueries to verify ownership through the parent row.
 
 ### Dashboard Features
 - **Overview Cards**: Quick stats (balance, sessions, requests)

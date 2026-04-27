@@ -28,7 +28,7 @@ SkillBarter connects students who want to learn with those who can teach. Instea
 - **Database**: Supabase (PostgreSQL)
 - **Authentication**: Supabase Auth (Email/Password + Google OAuth)
 - **Icons**: Lucide React
-- **AI**: Supabase Edge Function (`liza-ai`) proxying free OpenRouter models with streaming SSE responses
+- **AI**: Supabase Edge Function (`liza-ai`) proxying free Groq models (with internet-capable `groq/compound`) using streaming SSE responses
 - **PDF Parsing**: `pdfjs-dist` for in-browser text extraction (2 MB upload cap)
 
 ## Design
