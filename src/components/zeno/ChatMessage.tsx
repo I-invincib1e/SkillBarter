@@ -143,12 +143,36 @@ export function ChatMessage({ role, content, streaming }: ChatMessageProps) {
     );
   }
 
+  if (streaming && !content) {
+    return (
+      <div className="group py-3">
+        <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+          <span className="flex gap-1" aria-label="Zeno is thinking">
+            <span
+              className="w-1.5 h-1.5 rounded-full bg-current animate-bounce"
+              style={{ animationDelay: '0ms' }}
+            />
+            <span
+              className="w-1.5 h-1.5 rounded-full bg-current animate-bounce"
+              style={{ animationDelay: '150ms' }}
+            />
+            <span
+              className="w-1.5 h-1.5 rounded-full bg-current animate-bounce"
+              style={{ animationDelay: '300ms' }}
+            />
+          </span>
+          <span className="text-xs font-medium tracking-wide">Thinking</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="group py-3">
       <div className="text-[15px] text-gray-800 dark:text-gray-100">
         {renderMarkdown(content)}
         {streaming && (
-          <span className="inline-block w-2 h-4 align-middle ml-0.5 bg-current animate-pulse rounded-sm" />
+          <span className="inline-block w-[3px] h-4 align-middle ml-0.5 bg-emerald-500 dark:bg-emerald-400 animate-pulse rounded-sm" />
         )}
       </div>
       {!streaming && content && (
