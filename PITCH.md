@@ -150,45 +150,37 @@ Pavankumar will now cover how we validated all of this through testing."
 
 ## 4. Pavankumar -- UI/UX Designer & QA Tester
 
-### Opening (15 seconds)
+### Opening (10 seconds)
 
-"Thank you, Rutuja. My role was twofold: designing the user experience from the ground up, and then systematically breaking it to find every possible failure."
+"Thank you, Rutuja. I had two jobs -- design the look and feel of the app, and then test it hard to find any bugs."
 
-### Design Philosophy (1 minute)
+### Design (45 seconds)
 
-"The design principle behind SkillBarter is: a student should be able to sign up, find help, and book a session in under 2 minutes. Every screen has one primary action. We do not overwhelm users with options.
+"Our main goal: a student should sign up, find help, and book a session in under 2 minutes. Every screen has one clear action.
 
-**Visual hierarchy**: We use a consistent 8-pixel spacing grid, a 6-color system with multiple shades, and a maximum of 3 font weights. Dark mode is not an afterthought -- every component was designed for both themes simultaneously.
+- **Clean look**: 8-pixel spacing, 6 colors, only 3 font weights.
+- **Dark mode**: built into every screen from day one.
+- **Mobile-first**: phones come first. Bottom nav has 4 main items -- Dashboard, Discover, Sessions, Profile -- and a More menu for the rest. Buttons are big enough to tap easily.
+- **Trust**: new users show a 'New Provider' label instead of an empty rating, so they do not look bad. Real ratings appear after 3 reviews.
+- **Accessibility**: screen-reader labels, clear focus, and animations turn off for users who prefer less motion."
 
-**Mobile-first**: Over 60% of students access platforms on their phones. Our mobile navigation has 4 primary items at the bottom -- Dashboard, Discover, Sessions, Profile -- with a More menu that expands to reveal Wallet, Badges, Listings, Requests, and Settings. Touch targets are minimum 48 pixels.
+### Testing (1 minute)
 
-**Trust signals**: We display a 'New Provider' label for users with fewer than 3 reviews instead of showing an empty rating. This reframes 'unproven' as 'new opportunity' rather than 'untrustworthy'. Once they reach 3 reviews, the numeric rating appears.
+"I tested every important flow:
 
-**Accessibility**: We implemented ARIA landmarks on all layout regions, `aria-current='page'` on navigation items, `aria-expanded` on expandable menus, and we support `prefers-reduced-motion` so users who are sensitive to animation see no transitions."
+- **Credits**: booking locks the right amount, cancel returns it, complete sends it to the provider. Booking with not enough credits is rejected.
+- **Self-booking**: database blocks anyone from booking their own listing.
+- **Duplicate reviews**: the database stops a second review on the same session.
+- **Both must confirm**: credits only move after both users confirm.
+- **Timing lock**: a 60-minute session cannot be confirmed before 60 minutes pass.
+- **Screen sizes**: tested on phone (375px), tablet (768px), and desktop (1920px).
+- **Dark mode**: every screen checked in both themes for readable text."
 
-### Testing Approach (1 minute 15 seconds)
+### Closing (15 seconds)
 
-"I created a comprehensive test matrix covering every feature. Let me highlight the critical flows I tested:
+"In short, SkillBarter is not just a demo. It is safe, accessible, and ready to use.
 
-**Credit integrity testing**: I verified that when a session is booked, the requester's available balance decreases and locked credits increase by exactly the right amount. When cancelled, credits return completely. When completed, the provider receives the exact amount. I tested what happens when a user tries to book a session that costs more than their balance -- the atomic function rejects it cleanly.
-
-**Self-booking prevention**: I verified that the database CHECK constraint prevents a user from booking their own listing, even if someone bypasses the frontend validation.
-
-**Duplicate review prevention**: After posting a review, I attempted to post another for the same session. The UNIQUE constraint blocks it at the database level.
-
-**Dual confirmation**: I tested that credits do not transfer until both users confirm. If only one confirms, the session stays in 'confirmed' state. Only when the second person confirms does the full completion trigger.
-
-**Confirmation timing**: I verified the confirm button is disabled until scheduled_time plus duration has passed. A 60-minute session at 2:00 PM cannot be confirmed until 3:00 PM.
-
-**Responsive testing**: I tested across three breakpoints -- 375px mobile, 768px tablet, and 1920px desktop. Navigation adapts correctly, forms remain usable, and all content is readable.
-
-**Dark mode**: Every component was checked in both themes. Text contrast ratios meet readability standards in both modes."
-
-### Closing (30 seconds)
-
-"In summary: SkillBarter is not a prototype. It is a production-grade system with atomic server-side operations, database-level integrity constraints, comprehensive RLS security, full accessibility support, and a design that respects students' time.
-
-We are happy to take any questions."
+We are happy to answer your questions."
 
 ---
 
