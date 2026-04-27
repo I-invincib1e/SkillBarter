@@ -8,11 +8,16 @@ const corsHeaders = {
 };
 
 const FREE_MODELS = [
-  "google/gemini-2.0-flash-exp:free",
+  "minimax/minimax-m2.5:free",
+  "openai/gpt-oss-120b:free",
+  "z-ai/glm-4.5-air:free",
+  "nvidia/nemotron-3-nano-30b-a3b:free",
+  "google/gemma-4-31b-it:free",
+  "qwen/qwen3-next-80b-a3b-instruct:free",
+  "openai/gpt-oss-20b:free",
+  "nvidia/nemotron-nano-9b-v2:free",
   "meta-llama/llama-3.3-70b-instruct:free",
-  "deepseek/deepseek-chat-v3-0324:free",
-  "mistralai/mistral-small-3.2-24b-instruct:free",
-  "qwen/qwen-2.5-72b-instruct:free",
+  "google/gemini-2.0-flash-exp:free",
 ];
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 const MAX_SOURCE_CHARS = 30000;
